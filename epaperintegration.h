@@ -31,18 +31,18 @@
 **
 ****************************************************************************/
 
-#ifndef QPLATFORMINTEGRATION_MINIMAL_H
-#define QPLATFORMINTEGRATION_MINIMAL_H
+#ifndef QPLATFORMINTEGRATION_EPAPER_H
+#define QPLATFORMINTEGRATION_EPAPER_H
 
 #include <qpa/qplatformintegration.h>
 #include <qpa/qplatformscreen.h>
 
 QT_BEGIN_NAMESPACE
 
-class QMinimalScreen : public QPlatformScreen
+class EpaperScreen : public QPlatformScreen
 {
 public:
-    QMinimalScreen()
+    EpaperScreen()
         : mDepth(32), mFormat(QImage::Format_ARGB32_Premultiplied) {}
 
     QRect geometry() const Q_DECL_OVERRIDE { return mGeometry; }
@@ -60,7 +60,7 @@ public:
     QSize mPhysicalSize;
 };
 
-class QMinimalIntegration : public QObject, public QPlatformIntegration
+class EpaperIntegration : public QObject, public QPlatformIntegration
 {
     Q_OBJECT
 
@@ -70,8 +70,8 @@ public:
         EnableFonts = 0x2
     };
 
-    explicit QMinimalIntegration(const QStringList &parameters);
-    ~QMinimalIntegration();
+    explicit EpaperIntegration(const QStringList &parameters);
+    ~EpaperIntegration();
 
     bool hasCapability(QPlatformIntegration::Capability cap) const Q_DECL_OVERRIDE;
     QPlatformFontDatabase *fontDatabase() const Q_DECL_OVERRIDE;
@@ -84,7 +84,7 @@ public:
 
     unsigned options() const { return m_options; }
 
-    static QMinimalIntegration *instance();
+    static EpaperIntegration *instance();
 
 private:
     mutable QPlatformFontDatabase *m_fontDatabase;

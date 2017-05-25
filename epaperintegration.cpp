@@ -31,8 +31,8 @@
 **
 ****************************************************************************/
 
-#include "qminimalintegration.h"
-#include "qminimalbackingstore.h"
+#include "epaperintegration.h"
+#include "epaperbackingstore.h"
 
 #include <QtGui/private/qpixmap_raster_p.h>
 #include <QtGui/private/qguiapplication_p.h>
@@ -61,12 +61,12 @@ static inline unsigned parseOptions(const QStringList &paramList)
     unsigned options = 0;
     for (const QString &param : paramList) {
         if (param == QLatin1String("enable_fonts"))
-            options |= QMinimalIntegration::EnableFonts;
+            options |= EpaperIntegration::EnableFonts;
     }
     return options;
 }
 
-QMinimalIntegration::QMinimalIntegration(const QStringList &parameters) : QObject(),
+EpaperIntegration::EpaperIntegration(const QStringList &parameters) : QObject(),
     m_fontDatabase(0)
     , m_options(parseOptions(parameters))
 {
@@ -76,7 +76,7 @@ QMinimalIntegration::QMinimalIntegration(const QStringList &parameters) : QObjec
     }
     qDebug() << "EPD platform plugin loaded!";
 
-    QMinimalScreen *mPrimaryScreen = new QMinimalScreen();
+    EpaperScreen *mPrimaryScreen = new EpaperScreen();
 
     mPrimaryScreen->mGeometry = QRect(0, 0, 1404, 1872);
     //mPrimaryScreen->mGeometry = QRect(0, 0, 1872, 1404);
@@ -87,14 +87,14 @@ QMinimalIntegration::QMinimalIntegration(const QStringList &parameters) : QObjec
     screenAdded(mPrimaryScreen);
 }
 
-QMinimalIntegration::~QMinimalIntegration()
+EpaperIntegration::~EpaperIntegration()
 {
-    qDebug() << "Minimal integration dying";
+    qDebug() << "Epaper integration dying";
     delete m_fontDatabase;
-    qDebug() << "Minimal integration dead";
+    qDebug() << "Epaper integration dead";
 }
 
-bool QMinimalIntegration::hasCapability(QPlatformIntegration::Capability cap) const
+bool EpaperIntegration::hasCapability(QPlatformIntegration::Capability cap) const
 {
     switch (cap) {
     case ThreadedPixmaps: return true;
@@ -103,7 +103,7 @@ bool QMinimalIntegration::hasCapability(QPlatformIntegration::Capability cap) co
     }
 }
 
-void QMinimalIntegration::initialize()
+void EpaperIntegration::initialize()
 {
     new QEvdevKeyboardManager(QLatin1String("EvdevKeyboard"), QString(), nullptr);
     new QEvdevTouchManager(QLatin1String("EvdevTouch"), QString() /* spec */, nullptr);
@@ -120,7 +120,7 @@ public:
     virtual void populateFontDatabase() Q_DECL_OVERRIDE {}
 };
 
-QPlatformFontDatabase *QMinimalIntegration::fontDatabase() const
+QPlatformFontDatabase *EpaperIntegration::fontDatabase() const
 {
     if (!m_fontDatabase) {
         //m_fontDatabase = new QFontconfigDatabase();
@@ -129,7 +129,7 @@ QPlatformFontDatabase *QMinimalIntegration::fontDatabase() const
     return m_fontDatabase;
 }
 
-QPlatformWindow *QMinimalIntegration::createPlatformWindow(QWindow *window) const
+QPlatformWindow *EpaperIntegration::createPlatformWindow(QWindow *window) const
 {
     Q_UNUSED(window);
     qDebug() << "Creating window";
@@ -138,19 +138,19 @@ QPlatformWindow *QMinimalIntegration::createPlatformWindow(QWindow *window) cons
     return w;
 }
 
-QPlatformBackingStore *QMinimalIntegration::createPlatformBackingStore(QWindow *window) const
+QPlatformBackingStore *EpaperIntegration::createPlatformBackingStore(QWindow *window) const
 {
-    return new QMinimalBackingStore(window);
+    return new EpaperBackingStore(window);
 }
 
-QAbstractEventDispatcher *QMinimalIntegration::createEventDispatcher() const
+QAbstractEventDispatcher *EpaperIntegration::createEventDispatcher() const
 {
     return createUnixEventDispatcher();
 }
 
-QMinimalIntegration *QMinimalIntegration::instance()
+EpaperIntegration *EpaperIntegration::instance()
 {
-    return static_cast<QMinimalIntegration *>(QGuiApplicationPrivate::platformIntegration());
+    return static_cast<EpaperIntegration *>(QGuiApplicationPrivate::platformIntegration());
 }
 
 QT_END_NAMESPACE

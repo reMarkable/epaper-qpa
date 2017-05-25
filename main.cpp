@@ -33,22 +33,22 @@
 
 
 #include <qpa/qplatformintegrationplugin.h>
-#include "qminimalintegration.h"
+#include "epaperintegration.h"
 
 QT_BEGIN_NAMESPACE
 
-class QMinimalIntegrationPlugin : public QPlatformIntegrationPlugin
+class EpaperIntegrationPlugin : public QPlatformIntegrationPlugin
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID QPlatformIntegrationFactoryInterface_iid FILE "minimal.json")
+    Q_PLUGIN_METADATA(IID QPlatformIntegrationFactoryInterface_iid FILE "epaper.json")
 public:
     QPlatformIntegration *create(const QString&, const QStringList&) Q_DECL_OVERRIDE;
 };
 
-QPlatformIntegration *QMinimalIntegrationPlugin::create(const QString& system, const QStringList& paramList)
+QPlatformIntegration *EpaperIntegrationPlugin::create(const QString& system, const QStringList& paramList)
 {
-    if (!system.compare(QLatin1String("minimal"), Qt::CaseInsensitive))
-        return new QMinimalIntegration(paramList);
+    if (!system.compare(QLatin1String("epaper"), Qt::CaseInsensitive))
+        return new EpaperIntegration(paramList);
 
     return 0;
 }

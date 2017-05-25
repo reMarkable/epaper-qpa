@@ -31,8 +31,8 @@
 **
 ****************************************************************************/
 
-#ifndef QBACKINGSTORE_MINIMAL_H
-#define QBACKINGSTORE_MINIMAL_H
+#ifndef QBACKINGSTORE_EPAPER_H
+#define QBACKINGSTORE_EPAPER_H
 
 #include <qpa/qplatformbackingstore.h>
 #include <qpa/qplatformwindow.h>
@@ -40,11 +40,11 @@
 
 QT_BEGIN_NAMESPACE
 
-class QMinimalBackingStore : public QPlatformBackingStore
+class EpaperBackingStore : public QPlatformBackingStore
 {
 public:
-    QMinimalBackingStore(QWindow *window);
-    ~QMinimalBackingStore();
+    EpaperBackingStore(QWindow *window);
+    ~EpaperBackingStore();
 
     QPaintDevice *paintDevice() Q_DECL_OVERRIDE;
     void flush(QWindow *window, const QRegion &region, const QPoint &offset) Q_DECL_OVERRIDE;

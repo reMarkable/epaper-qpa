@@ -32,8 +32,8 @@
 ****************************************************************************/
 
 
-#include "qminimalbackingstore.h"
-#include "qminimalintegration.h"
+#include "epaperbackingstore.h"
+#include "epaperintegration.h"
 #include "qscreen.h"
 #include <QtCore/qdebug.h>
 #include <qpa/qplatformscreen.h>
@@ -41,27 +41,27 @@
 
 QT_BEGIN_NAMESPACE
 
-QMinimalBackingStore::QMinimalBackingStore(QWindow *window)
+EpaperBackingStore::EpaperBackingStore(QWindow *window)
     : QPlatformBackingStore(window)
-    , mDebug(QMinimalIntegration::instance()->options() & QMinimalIntegration::DebugBackingStore)
+    , mDebug(EpaperIntegration::instance()->options() & EpaperIntegration::DebugBackingStore)
 {
     if (mDebug)
-        qDebug() << "QMinimalBackingStore::QMinimalBackingStore:" << (quintptr)this;
+        qDebug() << "EpaperBackingStore::EpaperBackingStore:" << (quintptr)this;
 }
 
-QMinimalBackingStore::~QMinimalBackingStore()
+EpaperBackingStore::~EpaperBackingStore()
 {
 }
 
-QPaintDevice *QMinimalBackingStore::paintDevice()
+QPaintDevice *EpaperBackingStore::paintDevice()
 {
     if (mDebug)
-        qDebug() << "QMinimalBackingStore::paintDevice";
+        qDebug() << "EpaperBackingStore::paintDevice";
 
     return &mImage;
 }
 
-void QMinimalBackingStore::flush(QWindow *window, const QRegion &region, const QPoint &offset)
+void EpaperBackingStore::flush(QWindow *window, const QRegion &region, const QPoint &offset)
 {
     Q_UNUSED(window);
     Q_UNUSED(region);
@@ -70,12 +70,12 @@ void QMinimalBackingStore::flush(QWindow *window, const QRegion &region, const Q
     if (mDebug) {
         static int c = 0;
         QString filename = QString("output%1.png").arg(c++, 4, 10, QLatin1Char('0'));
-        qDebug() << "QMinimalBackingStore::flush() saving contents to" << filename.toLocal8Bit().constData();
+        qDebug() << "EpaperBackingStore::flush() saving contents to" << filename.toLocal8Bit().constData();
         mImage.save(filename);
     }
 }
 
-void QMinimalBackingStore::resize(const QSize &size, const QRegion &)
+void EpaperBackingStore::resize(const QSize &size, const QRegion &)
 {
     QImage::Format format = QGuiApplication::primaryScreen()->handle()->format();
     if (mImage.size() != size)
