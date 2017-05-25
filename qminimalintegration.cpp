@@ -38,12 +38,18 @@
 #include <QtGui/private/qguiapplication_p.h>
 #include <qpa/qplatformwindow.h>
 #include <qpa/qplatformfontdatabase.h>
-#include <QtFontDatabaseSupport/private/qgenericunixfontdatabase_p.h>
-#include <QtInputSupport/private/qevdevkeyboardmanager_p.h>
-#include <QtInputSupport/private/qevdevtouchmanager_p.h>
-#include <QtInputSupport/private/qevdevmousemanager_p.h>
+//#include <QtFontDatabaseSupport/private/qgenericunixfontdatabase_p.h>
+#include <private/qevdevkeyboardmanager_p.h>
+#include <private/qevdevtouchmanager_p.h>
+#include <private/qevdevmousemanager_p.h>
 
-#include <QtEventDispatcherSupport/private/qgenericunixeventdispatcher_p.h>
+//#include <QtInputSupport/private/qevdevkeyboardmanager_p.h>
+//#include <QtInputSupport/private/qevdevtouchmanager_p.h>
+//#include <QtInputSupport/private/qevdevmousemanager_p.h>
+
+#include <private/qgenericunixfontdatabase_p.h>
+//#include <QtEventDispatcherSupport/private/qgenericunixeventdispatcher_p.h>
+#include <private/qgenericunixeventdispatcher_p.h>
 //#include <QtPlatformSupport/private/qtslib_p.h>
 
 QT_BEGIN_NAMESPACE

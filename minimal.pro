@@ -1,7 +1,7 @@
 TARGET = qminimal
 
 
-QT += core-private gui-private theme_support-private fontdatabase_support-private input_support-private eventdispatcher_support-private
+QT += core-private gui-private platformsupport-private
 
 #LIBS += -lQt5PlatformSupport -lQt5Gui
 
@@ -14,7 +14,7 @@ HEADERS =   qminimalintegration.h \
 OTHER_FILES += minimal.json
 
 CONFIG +=  plugin
-#CONFIG += qpa/genericunixfontdatabase
+CONFIG += qpa/genericunixfontdatabase
 #PLUGIN_TYPE = platforms
 #PLUGIN_CLASS_NAME = QMinimalIntegrationPlugin
 #!equals(TARGET, $$QT_DEFAULT_QPA_PLUGIN): PLUGIN_EXTENDS = -
