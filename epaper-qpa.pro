@@ -3,7 +3,7 @@ TEMPLATE = lib
 
 CONFIG += plugin
 CONFIG += qpa/genericunixfontdatabase
-QT += core-private gui-private platformsupport-private
+QT += core-private gui-private input_support-private fontdatabase_support-private eventdispatcher_support-private
 
 SOURCES =   main.cpp \
             epaperintegration.cpp \
