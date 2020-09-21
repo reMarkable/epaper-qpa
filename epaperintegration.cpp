@@ -83,8 +83,11 @@ EpaperIntegration::EpaperIntegration(const QStringList &parameters) : QObject(),
 
     mPrimaryScreen->mDepth = 32;
     mPrimaryScreen->mFormat = QImage::Format_RGB16;
-
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 13, 0))
+    QWindowSystemInterface::handleScreenAdded(mPrimaryScreen);
+#else
     screenAdded(mPrimaryScreen);
+#endif
 }
 
 EpaperIntegration::~EpaperIntegration()
