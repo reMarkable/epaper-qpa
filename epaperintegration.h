@@ -71,6 +71,7 @@ public:
 
     bool hasCapability(QPlatformIntegration::Capability cap) const override;
     QPlatformFontDatabase *fontDatabase() const override;
+    QPlatformInputContext *inputContext() const override;
 
     void initialize() override;
 
@@ -82,6 +83,7 @@ public:
 
 private:
     mutable QPlatformFontDatabase *m_fontDatabase;
+    QPlatformInputContext *m_inputContext;
 };
 
 QT_END_NAMESPACE
