@@ -52,8 +52,6 @@ EpaperIntegration::EpaperIntegration(const QStringList &parameters) :
     m_fontDatabase(0)
 {
     Q_UNUSED(parameters);
-    qDebug() << "EPD platform plugin loaded!";
-
     EpaperScreen *mPrimaryScreen = new EpaperScreen();
 
     mPrimaryScreen->mGeometry = QRect(0, 0, 1404, 1872);
@@ -69,9 +67,7 @@ EpaperIntegration::EpaperIntegration(const QStringList &parameters) :
 
 EpaperIntegration::~EpaperIntegration()
 {
-    qDebug() << "Epaper integration dying";
     delete m_fontDatabase;
-    qDebug() << "Epaper integration dead";
 }
 
 bool EpaperIntegration::hasCapability(QPlatformIntegration::Capability cap) const
@@ -102,8 +98,6 @@ QPlatformFontDatabase *EpaperIntegration::fontDatabase() const
 
 QPlatformWindow *EpaperIntegration::createPlatformWindow(QWindow *window) const
 {
-    Q_UNUSED(window);
-    qDebug() << "Creating window";
     QPlatformWindow *w = new QPlatformWindow(window);
     w->requestActivateWindow();
     return w;
