@@ -31,19 +31,17 @@
 **
 ****************************************************************************/
 
-
 #include "epaperbackingstore.h"
 #include "epaperintegration.h"
 #include "qscreen.h"
 #include <QtCore/qdebug.h>
-#include <qpa/qplatformscreen.h>
 #include <private/qguiapplication_p.h>
+#include <qpa/qplatformscreen.h>
 
 QT_BEGIN_NAMESPACE
 
-EpaperBackingStore::EpaperBackingStore(QWindow *window)
-    : QPlatformBackingStore(window)
-    , mDebug(EpaperIntegration::instance()->options() & EpaperIntegration::DebugBackingStore)
+EpaperBackingStore::EpaperBackingStore(QWindow *window) :
+    QPlatformBackingStore(window), mDebug(EpaperIntegration::instance()->options() & EpaperIntegration::DebugBackingStore)
 {
     if (mDebug)
         qDebug() << "EpaperBackingStore::EpaperBackingStore:" << (quintptr)this;

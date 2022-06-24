@@ -42,13 +42,14 @@ QT_BEGIN_NAMESPACE
 class EpaperScreen : public QPlatformScreen
 {
 public:
-    EpaperScreen()
-        : mDepth(32), mFormat(QImage::Format_ARGB32_Premultiplied) {}
+    EpaperScreen() :
+        mDepth(32), mFormat(QImage::Format_ARGB32_Premultiplied) { }
 
     QRect geometry() const Q_DECL_OVERRIDE { return mGeometry; }
     int depth() const Q_DECL_OVERRIDE { return mDepth; }
     QImage::Format format() const Q_DECL_OVERRIDE { return mFormat; }
-    QSizeF physicalSize() const Q_DECL_OVERRIDE {
+    QSizeF physicalSize() const Q_DECL_OVERRIDE
+    {
         static const int dpi = 228;
         return QSizeF(geometry().size()) / dpi * qreal(25.4);
     }

@@ -34,14 +34,14 @@
 #include "epaperintegration.h"
 #include "epaperbackingstore.h"
 
-#include <QtGui/private/qpixmap_raster_p.h>
 #include <QtGui/private/qguiapplication_p.h>
-#include <qpa/qplatformwindow.h>
+#include <QtGui/private/qpixmap_raster_p.h>
 #include <qpa/qplatformfontdatabase.h>
+#include <qpa/qplatformwindow.h>
 //#include <QtFontDatabaseSupport/private/qgenericunixfontdatabase_p.h>
 #include <private/qevdevkeyboardmanager_p.h>
-#include <private/qevdevtouchmanager_p.h>
 #include <private/qevdevmousemanager_p.h>
+#include <private/qevdevtouchmanager_p.h>
 
 //#include <QtInputSupport/private/qevdevkeyboardmanager_p.h>
 //#include <QtInputSupport/private/qevdevtouchmanager_p.h>
@@ -66,9 +66,9 @@ static inline unsigned parseOptions(const QStringList &paramList)
     return options;
 }
 
-EpaperIntegration::EpaperIntegration(const QStringList &parameters) : QObject(),
-    m_fontDatabase(0)
-    , m_options(parseOptions(parameters))
+EpaperIntegration::EpaperIntegration(const QStringList &parameters) :
+    QObject(),
+    m_fontDatabase(0), m_options(parseOptions(parameters))
 {
     if (qEnvironmentVariableIsSet(debugBackingStoreEnvironmentVariable)
         && qEnvironmentVariableIntValue(debugBackingStoreEnvironmentVariable) > 0) {
@@ -79,7 +79,7 @@ EpaperIntegration::EpaperIntegration(const QStringList &parameters) : QObject(),
     EpaperScreen *mPrimaryScreen = new EpaperScreen();
 
     mPrimaryScreen->mGeometry = QRect(0, 0, 1404, 1872);
-    //mPrimaryScreen->mGeometry = QRect(0, 0, 1872, 1404);
+    // mPrimaryScreen->mGeometry = QRect(0, 0, 1872, 1404);
 
     mPrimaryScreen->mDepth = 32;
     mPrimaryScreen->mFormat = QImage::Format_RGB16;
@@ -100,9 +100,12 @@ EpaperIntegration::~EpaperIntegration()
 bool EpaperIntegration::hasCapability(QPlatformIntegration::Capability cap) const
 {
     switch (cap) {
-    case ThreadedPixmaps: return true;
-    case MultipleWindows: return true;
-    default: return QPlatformIntegration::hasCapability(cap);
+    case ThreadedPixmaps:
+        return true;
+    case MultipleWindows:
+        return true;
+    default:
+        return QPlatformIntegration::hasCapability(cap);
     }
 }
 
@@ -110,8 +113,8 @@ void EpaperIntegration::initialize()
 {
     new QEvdevKeyboardManager(QLatin1String("EvdevKeyboard"), QString(), nullptr);
     new QEvdevTouchManager(QLatin1String("EvdevTouch"), QString() /* spec */, nullptr);
-    //new QEvdevMouseManager(QLatin1String("EvdevMouse"), QString() /* spec */, qApp);
-    //new QTsLibMouseHandler(QLatin1String("TsLib"), QString());
+    // new QEvdevMouseManager(QLatin1String("EvdevMouse"), QString() /* spec */, qApp);
+    // new QTsLibMouseHandler(QLatin1String("TsLib"), QString());
 }
 
 // Dummy font database that does not scan the fonts directory to be
@@ -120,13 +123,13 @@ void EpaperIntegration::initialize()
 class DummyFontDatabase : public QPlatformFontDatabase
 {
 public:
-    virtual void populateFontDatabase() Q_DECL_OVERRIDE {}
+    virtual void populateFontDatabase() Q_DECL_OVERRIDE { }
 };
 
 QPlatformFontDatabase *EpaperIntegration::fontDatabase() const
 {
     if (!m_fontDatabase) {
-        //m_fontDatabase = new QFontconfigDatabase();
+        // m_fontDatabase = new QFontconfigDatabase();
         m_fontDatabase = new QGenericUnixFontDatabase();
     }
     return m_fontDatabase;

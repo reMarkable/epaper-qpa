@@ -34,9 +34,9 @@
 #ifndef QBACKINGSTORE_EPAPER_H
 #define QBACKINGSTORE_EPAPER_H
 
+#include <QtGui/QImage>
 #include <qpa/qplatformbackingstore.h>
 #include <qpa/qplatformwindow.h>
-#include <QtGui/QImage>
 
 QT_BEGIN_NAMESPACE
 
