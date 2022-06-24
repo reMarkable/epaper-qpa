@@ -108,15 +108,6 @@ void EpaperIntegration::initialize()
     // new QTsLibMouseHandler(QLatin1String("TsLib"), QString());
 }
 
-// Dummy font database that does not scan the fonts directory to be
-// used for command line tools like qmlplugindump that do not create windows
-// unless DebugBackingStore is activated.
-class DummyFontDatabase : public QPlatformFontDatabase
-{
-public:
-    virtual void populateFontDatabase() Q_DECL_OVERRIDE { }
-};
-
 QPlatformFontDatabase *EpaperIntegration::fontDatabase() const
 {
     if (!m_fontDatabase) {
