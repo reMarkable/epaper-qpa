@@ -66,10 +66,6 @@ class EpaperIntegration : public QObject, public QPlatformIntegration
     Q_OBJECT
 
 public:
-    enum Options { // Options to be passed on command line or determined from environment
-        DebugBackingStore = 0x1,
-    };
-
     explicit EpaperIntegration(const QStringList &parameters);
     ~EpaperIntegration();
 
@@ -82,13 +78,10 @@ public:
     QPlatformBackingStore *createPlatformBackingStore(QWindow *window) const Q_DECL_OVERRIDE;
     QAbstractEventDispatcher *createEventDispatcher() const Q_DECL_OVERRIDE;
 
-    unsigned options() const { return m_options; }
-
     static EpaperIntegration *instance();
 
 private:
     mutable QPlatformFontDatabase *m_fontDatabase;
-    unsigned m_options;
 };
 
 QT_END_NAMESPACE

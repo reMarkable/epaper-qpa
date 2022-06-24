@@ -47,17 +47,11 @@
 
 QT_BEGIN_NAMESPACE
 
-static const char debugBackingStoreEnvironmentVariable[] = "QT_DEBUG_BACKINGSTORE";
-
 EpaperIntegration::EpaperIntegration(const QStringList &parameters) :
     QObject(),
-    m_fontDatabase(0), m_options(0)
+    m_fontDatabase(0)
 {
     Q_UNUSED(parameters);
-    if (qEnvironmentVariableIsSet(debugBackingStoreEnvironmentVariable)
-        && qEnvironmentVariableIntValue(debugBackingStoreEnvironmentVariable) > 0) {
-        m_options |= DebugBackingStore;
-    }
     qDebug() << "EPD platform plugin loaded!";
 
     EpaperScreen *mPrimaryScreen = new EpaperScreen();
