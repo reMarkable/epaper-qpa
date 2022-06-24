@@ -38,19 +38,12 @@
 #include <QtGui/private/qpixmap_raster_p.h>
 #include <qpa/qplatformfontdatabase.h>
 #include <qpa/qplatformwindow.h>
-//#include <QtFontDatabaseSupport/private/qgenericunixfontdatabase_p.h>
+
 #include <private/qevdevkeyboardmanager_p.h>
 #include <private/qevdevmousemanager_p.h>
 #include <private/qevdevtouchmanager_p.h>
-
-//#include <QtInputSupport/private/qevdevkeyboardmanager_p.h>
-//#include <QtInputSupport/private/qevdevtouchmanager_p.h>
-//#include <QtInputSupport/private/qevdevmousemanager_p.h>
-
-#include <private/qgenericunixfontdatabase_p.h>
-//#include <QtEventDispatcherSupport/private/qgenericunixeventdispatcher_p.h>
 #include <private/qgenericunixeventdispatcher_p.h>
-//#include <QtPlatformSupport/private/qtslib_p.h>
+#include <private/qgenericunixfontdatabase_p.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -70,7 +63,6 @@ EpaperIntegration::EpaperIntegration(const QStringList &parameters) :
     EpaperScreen *mPrimaryScreen = new EpaperScreen();
 
     mPrimaryScreen->mGeometry = QRect(0, 0, 1404, 1872);
-    // mPrimaryScreen->mGeometry = QRect(0, 0, 1872, 1404);
 
     mPrimaryScreen->mDepth = 32;
     mPrimaryScreen->mFormat = QImage::Format_RGB16;
@@ -104,14 +96,11 @@ void EpaperIntegration::initialize()
 {
     new QEvdevKeyboardManager(QLatin1String("EvdevKeyboard"), QString(), nullptr);
     new QEvdevTouchManager(QLatin1String("EvdevTouch"), QString() /* spec */, nullptr);
-    // new QEvdevMouseManager(QLatin1String("EvdevMouse"), QString() /* spec */, qApp);
-    // new QTsLibMouseHandler(QLatin1String("TsLib"), QString());
 }
 
 QPlatformFontDatabase *EpaperIntegration::fontDatabase() const
 {
     if (!m_fontDatabase) {
-        // m_fontDatabase = new QFontconfigDatabase();
         m_fontDatabase = new QGenericUnixFontDatabase();
     }
     return m_fontDatabase;
