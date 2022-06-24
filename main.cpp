@@ -31,9 +31,8 @@
 **
 ****************************************************************************/
 
-
-#include <qpa/qplatformintegrationplugin.h>
 #include "epaperintegration.h"
+#include <qpa/qplatformintegrationplugin.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -42,10 +41,10 @@ class EpaperIntegrationPlugin : public QPlatformIntegrationPlugin
     Q_OBJECT
     Q_PLUGIN_METADATA(IID QPlatformIntegrationFactoryInterface_iid FILE "epaper.json")
 public:
-    QPlatformIntegration *create(const QString&, const QStringList&) Q_DECL_OVERRIDE;
+    QPlatformIntegration *create(const QString &, const QStringList &) Q_DECL_OVERRIDE;
 };
 
-QPlatformIntegration *EpaperIntegrationPlugin::create(const QString& system, const QStringList& paramList)
+QPlatformIntegration *EpaperIntegrationPlugin::create(const QString &system, const QStringList &paramList)
 {
     if (!system.compare(QLatin1String("epaper"), Qt::CaseInsensitive))
         return new EpaperIntegration(paramList);

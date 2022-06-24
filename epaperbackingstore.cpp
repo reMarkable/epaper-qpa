@@ -31,22 +31,18 @@
 **
 ****************************************************************************/
 
-
 #include "epaperbackingstore.h"
 #include "epaperintegration.h"
 #include "qscreen.h"
 #include <QtCore/qdebug.h>
-#include <qpa/qplatformscreen.h>
 #include <private/qguiapplication_p.h>
+#include <qpa/qplatformscreen.h>
 
 QT_BEGIN_NAMESPACE
 
-EpaperBackingStore::EpaperBackingStore(QWindow *window)
-    : QPlatformBackingStore(window)
-    , mDebug(EpaperIntegration::instance()->options() & EpaperIntegration::DebugBackingStore)
+EpaperBackingStore::EpaperBackingStore(QWindow *window) :
+    QPlatformBackingStore(window)
 {
-    if (mDebug)
-        qDebug() << "EpaperBackingStore::EpaperBackingStore:" << (quintptr)this;
 }
 
 EpaperBackingStore::~EpaperBackingStore()
@@ -55,9 +51,6 @@ EpaperBackingStore::~EpaperBackingStore()
 
 QPaintDevice *EpaperBackingStore::paintDevice()
 {
-    if (mDebug)
-        qDebug() << "EpaperBackingStore::paintDevice";
-
     return &mImage;
 }
 
@@ -66,13 +59,6 @@ void EpaperBackingStore::flush(QWindow *window, const QRegion &region, const QPo
     Q_UNUSED(window);
     Q_UNUSED(region);
     Q_UNUSED(offset);
-
-    if (mDebug) {
-        static int c = 0;
-        QString filename = QString("output%1.png").arg(c++, 4, 10, QLatin1Char('0'));
-        qDebug() << "EpaperBackingStore::flush() saving contents to" << filename.toLocal8Bit().constData();
-        mImage.save(filename);
-    }
 }
 
 void EpaperBackingStore::resize(const QSize &size, const QRegion &)

@@ -34,9 +34,9 @@
 #ifndef QBACKINGSTORE_EPAPER_H
 #define QBACKINGSTORE_EPAPER_H
 
+#include <QtGui/QImage>
 #include <qpa/qplatformbackingstore.h>
 #include <qpa/qplatformwindow.h>
-#include <QtGui/QImage>
 
 QT_BEGIN_NAMESPACE
 
@@ -46,13 +46,12 @@ public:
     EpaperBackingStore(QWindow *window);
     ~EpaperBackingStore();
 
-    QPaintDevice *paintDevice() Q_DECL_OVERRIDE;
-    void flush(QWindow *window, const QRegion &region, const QPoint &offset) Q_DECL_OVERRIDE;
-    void resize(const QSize &size, const QRegion &staticContents) Q_DECL_OVERRIDE;
+    QPaintDevice *paintDevice() override;
+    void flush(QWindow *window, const QRegion &region, const QPoint &offset) override;
+    void resize(const QSize &size, const QRegion &staticContents) override;
 
 private:
     QImage mImage;
-    const bool mDebug;
 };
 
 QT_END_NAMESPACE
