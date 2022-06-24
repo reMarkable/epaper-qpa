@@ -56,23 +56,14 @@ QT_BEGIN_NAMESPACE
 
 static const char debugBackingStoreEnvironmentVariable[] = "QT_DEBUG_BACKINGSTORE";
 
-static inline unsigned parseOptions(const QStringList &paramList)
-{
-    unsigned options = 0;
-    for (const QString &param : paramList) {
-        if (param == QLatin1String("enable_fonts"))
-            options |= EpaperIntegration::EnableFonts;
-    }
-    return options;
-}
-
 EpaperIntegration::EpaperIntegration(const QStringList &parameters) :
     QObject(),
-    m_fontDatabase(0), m_options(parseOptions(parameters))
+    m_fontDatabase(0), m_options(0)
 {
+    Q_UNUSED(parameters);
     if (qEnvironmentVariableIsSet(debugBackingStoreEnvironmentVariable)
         && qEnvironmentVariableIntValue(debugBackingStoreEnvironmentVariable) > 0) {
-        m_options |= DebugBackingStore | EnableFonts;
+        m_options |= DebugBackingStore;
     }
     qDebug() << "EPD platform plugin loaded!";
 

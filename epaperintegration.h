@@ -68,7 +68,6 @@ class EpaperIntegration : public QObject, public QPlatformIntegration
 public:
     enum Options { // Options to be passed on command line or determined from environment
         DebugBackingStore = 0x1,
-        EnableFonts = 0x2
     };
 
     explicit EpaperIntegration(const QStringList &parameters);
