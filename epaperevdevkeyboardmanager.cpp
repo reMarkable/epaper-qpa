@@ -171,10 +171,4 @@ void EpaperEvdevKeyboardManager::loadKeymap(const QString &file)
     }
 }
 
-void EpaperEvdevKeyboardManager::switchLang()
-{
-    for (const auto &keyboard : m_keyboards)
-        keyboard.handler->switchLang();
-}
-
 QT_END_NAMESPACE

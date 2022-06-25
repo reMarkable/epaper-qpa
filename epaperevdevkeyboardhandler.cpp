@@ -84,7 +84,7 @@ void EpaperEvdevFdContainer::reset() noexcept
 EpaperEvdevKeyboardHandler::EpaperEvdevKeyboardHandler(const QString &device, EpaperEvdevFdContainer &fd, bool disableZap, bool enableCompose, const QString &keymapFile) :
     m_device(device), m_fd(fd.release()), m_notify(nullptr),
     m_modifiers(0), m_composing(0), m_dead_unicode(0xffff),
-    m_langLock(0), m_no_zap(disableZap), m_do_compose(enableCompose),
+    m_no_zap(disableZap), m_do_compose(enableCompose),
     m_keymap(0), m_keymap_size(0), m_keycompose(0), m_keycompose_size(0)
 {
     qCDebug(EpaperEvdevKeyboardLog) << "Create keyboard handler with for device" << device;
@@ -265,8 +265,6 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
             quint8 testmods = m_modifiers;
             if (m_locks[0] /*CapsLock*/ && (m->flags & EpaperEvdevKeyboardMap::IsLetter))
                 testmods ^= EpaperEvdevKeyboardMap::ModShift;
-            if (m_langLock)
-                testmods ^= EpaperEvdevKeyboardMap::ModAltGr;
             if (m->modifiers == testmods)
                 map_withmod = m;
         }
@@ -524,8 +522,6 @@ void EpaperEvdevKeyboardHandler::unloadKeymap()
             m_locks[2] = 1;
         qCDebug(EpaperEvdevKeyboardLog, "numlock=%d , capslock=%d, scrolllock=%d", m_locks[1], m_locks[0], m_locks[2]);
     }
-
-    m_langLock = 0;
 }
 
 bool EpaperEvdevKeyboardHandler::loadKeymap(const QString &file)
@@ -585,11 +581,6 @@ bool EpaperEvdevKeyboardHandler::loadKeymap(const QString &file)
     m_do_compose = true;
 
     return true;
-}
-
-void EpaperEvdevKeyboardHandler::switchLang()
-{
-    m_langLock ^= 1;
 }
 
 QT_END_NAMESPACE
