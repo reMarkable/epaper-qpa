@@ -37,8 +37,7 @@
 **
 ****************************************************************************/
 
-#ifndef QEVDEVKEYBOARDHANDLER_P_H
-#define QEVDEVKEYBOARDHANDLER_P_H
+#pragma once
 
 //
 //  W A R N I N G
@@ -61,7 +60,7 @@ QT_BEGIN_NAMESPACE
 
 class QSocketNotifier;
 
-namespace QEvdevKeyboardMap {
+namespace EpaperEvdevKeyboardMap {
 const quint32 FileMagic = 0x514d4150; // 'QMAP'
 
 struct Mapping
@@ -112,35 +111,35 @@ enum Modifiers {
 };
 }
 
-inline QDataStream &operator>>(QDataStream &ds, QEvdevKeyboardMap::Mapping &m)
+inline QDataStream &operator>>(QDataStream &ds, EpaperEvdevKeyboardMap::Mapping &m)
 {
     return ds >> m.keycode >> m.unicode >> m.qtcode >> m.modifiers >> m.flags >> m.special;
 }
 
-inline QDataStream &operator<<(QDataStream &ds, const QEvdevKeyboardMap::Mapping &m)
+inline QDataStream &operator<<(QDataStream &ds, const EpaperEvdevKeyboardMap::Mapping &m)
 {
     return ds << m.keycode << m.unicode << m.qtcode << m.modifiers << m.flags << m.special;
 }
 
-inline QDataStream &operator>>(QDataStream &ds, QEvdevKeyboardMap::Composing &c)
+inline QDataStream &operator>>(QDataStream &ds, EpaperEvdevKeyboardMap::Composing &c)
 {
     return ds >> c.first >> c.second >> c.result;
 }
 
-inline QDataStream &operator<<(QDataStream &ds, const QEvdevKeyboardMap::Composing &c)
+inline QDataStream &operator<<(QDataStream &ds, const EpaperEvdevKeyboardMap::Composing &c)
 {
     return ds << c.first << c.second << c.result;
 }
 
-class QFdContainer
+class EpaperEvdevFdContainer
 {
     int m_fd;
-    Q_DISABLE_COPY_MOVE(QFdContainer);
+    Q_DISABLE_COPY_MOVE(EpaperEvdevFdContainer);
 
 public:
-    explicit QFdContainer(int fd = -1) noexcept :
+    explicit EpaperEvdevFdContainer(int fd = -1) noexcept :
         m_fd(fd) { }
-    ~QFdContainer() { reset(); }
+    ~EpaperEvdevFdContainer() { reset(); }
 
     int get() const noexcept { return m_fd; }
 
@@ -153,11 +152,11 @@ public:
     void reset() noexcept;
 };
 
-class QEvdevKeyboardHandler : public QObject
+class EpaperEvdevKeyboardHandler : public QObject
 {
 public:
-    QEvdevKeyboardHandler(const QString &device, QFdContainer &fd, bool disableZap, bool enableCompose, const QString &keymapFile);
-    ~QEvdevKeyboardHandler();
+    EpaperEvdevKeyboardHandler(const QString &device, EpaperEvdevFdContainer &fd, bool disableZap, bool enableCompose, const QString &keymapFile);
+    ~EpaperEvdevKeyboardHandler();
 
     enum KeycodeAction {
         None = 0,
@@ -178,19 +177,19 @@ public:
         SwitchConsoleMask = 0x0000007f
     };
 
-    static std::unique_ptr<QEvdevKeyboardHandler> create(const QString &device,
-                                                         const QString &specification,
-                                                         const QString &defaultKeymapFile = QString());
+    static std::unique_ptr<EpaperEvdevKeyboardHandler> create(const QString &device,
+                                                              const QString &specification,
+                                                              const QString &defaultKeymapFile = QString());
 
     static Qt::KeyboardModifiers toQtModifiers(quint8 mod)
     {
         Qt::KeyboardModifiers qtmod = Qt::NoModifier;
 
-        if (mod & (QEvdevKeyboardMap::ModShift | QEvdevKeyboardMap::ModShiftL | QEvdevKeyboardMap::ModShiftR))
+        if (mod & (EpaperEvdevKeyboardMap::ModShift | EpaperEvdevKeyboardMap::ModShiftL | EpaperEvdevKeyboardMap::ModShiftR))
             qtmod |= Qt::ShiftModifier;
-        if (mod & (QEvdevKeyboardMap::ModControl | QEvdevKeyboardMap::ModCtrlL | QEvdevKeyboardMap::ModCtrlR))
+        if (mod & (EpaperEvdevKeyboardMap::ModControl | EpaperEvdevKeyboardMap::ModCtrlL | EpaperEvdevKeyboardMap::ModCtrlR))
             qtmod |= Qt::ControlModifier;
-        if (mod & QEvdevKeyboardMap::ModAlt)
+        if (mod & EpaperEvdevKeyboardMap::ModAlt)
             qtmod |= Qt::AltModifier;
 
         return qtmod;
@@ -210,7 +209,7 @@ private:
     void switchLed(int, bool);
 
     QString m_device;
-    QFdContainer m_fd;
+    EpaperEvdevFdContainer m_fd;
     QSocketNotifier *m_notify;
 
     // keymap handling
@@ -223,15 +222,13 @@ private:
     bool m_no_zap;
     bool m_do_compose;
 
-    const QEvdevKeyboardMap::Mapping *m_keymap;
+    const EpaperEvdevKeyboardMap::Mapping *m_keymap;
     int m_keymap_size;
-    const QEvdevKeyboardMap::Composing *m_keycompose;
+    const EpaperEvdevKeyboardMap::Composing *m_keycompose;
     int m_keycompose_size;
 
-    static const QEvdevKeyboardMap::Mapping s_keymap_default[];
-    static const QEvdevKeyboardMap::Composing s_keycompose_default[];
+    static const EpaperEvdevKeyboardMap::Mapping s_keymap_default[];
+    static const EpaperEvdevKeyboardMap::Composing s_keycompose_default[];
 };
 
 QT_END_NAMESPACE
-
-#endif // QEVDEVKEYBOARDHANDLER_P_H

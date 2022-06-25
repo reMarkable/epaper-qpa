@@ -37,9 +37,7 @@
 **
 ****************************************************************************/
 
-#include "qevdevkeyboardmanager_p.h"
-
-#include <QtInputSupport/private/qevdevutil_p.h>
+#include "epaperevdevkeyboardmanager.h"
 
 #include <QCoreApplication>
 #include <QLoggingCategory>
@@ -52,7 +50,41 @@ QT_BEGIN_NAMESPACE
 
 Q_DECLARE_LOGGING_CATEGORY(qLcEvdevKey)
 
-QEvdevKeyboardManager::QEvdevKeyboardManager(const QString &key, const QString &specification, QObject *parent) :
+// This code is originally from QEvdevUtil, extracted to keep this code independent.
+namespace EpaperEvdevUtil {
+
+struct ParsedSpecification
+{
+    QString spec;
+    QStringList devices;
+    QVector<QStringRef> args;
+};
+
+ParsedSpecification parseSpecification(const QString &specification)
+{
+    ParsedSpecification result;
+
+    result.args = specification.splitRef(QLatin1Char(':'));
+
+    for (const QStringRef &arg : qAsConst(result.args)) {
+        if (arg.startsWith(QLatin1String("/dev/"))) {
+            // if device is specified try to use it
+            result.devices.append(arg.toString());
+        } else {
+            // build new specification without /dev/ elements
+            result.spec += arg + QLatin1Char(':');
+        }
+    }
+
+    if (!result.spec.isEmpty())
+        result.spec.chop(1); // remove trailing ':'
+
+    return result;
+}
+
+}
+
+EpaperEvdevKeyboardManager::EpaperEvdevKeyboardManager(const QString &key, const QString &specification, QObject *parent) :
     QObject(parent)
 {
     Q_UNUSED(key);
@@ -62,7 +94,7 @@ QEvdevKeyboardManager::QEvdevKeyboardManager(const QString &key, const QString &
     if (spec.isEmpty())
         spec = specification;
 
-    auto parsed = QEvdevUtil::parseSpecification(spec);
+    auto parsed = EpaperEvdevUtil::parseSpecification(spec);
     m_spec = std::move(parsed.spec);
 
     // add all keyboards for devices specified in the argument list
@@ -78,21 +110,21 @@ QEvdevKeyboardManager::QEvdevKeyboardManager(const QString &key, const QString &
                 addKeyboard(device);
 
             connect(deviceDiscovery, &QDeviceDiscovery::deviceDetected,
-                    this, &QEvdevKeyboardManager::addKeyboard);
+                    this, &EpaperEvdevKeyboardManager::addKeyboard);
             connect(deviceDiscovery, &QDeviceDiscovery::deviceRemoved,
-                    this, &QEvdevKeyboardManager::removeKeyboard);
+                    this, &EpaperEvdevKeyboardManager::removeKeyboard);
         }
     }
 }
 
-QEvdevKeyboardManager::~QEvdevKeyboardManager()
+EpaperEvdevKeyboardManager::~EpaperEvdevKeyboardManager()
 {
 }
 
-void QEvdevKeyboardManager::addKeyboard(const QString &deviceNode)
+void EpaperEvdevKeyboardManager::addKeyboard(const QString &deviceNode)
 {
     qCDebug(qLcEvdevKey, "Adding keyboard at %ls", qUtf16Printable(deviceNode));
-    auto keyboard = QEvdevKeyboardHandler::create(deviceNode, m_spec, m_defaultKeymapFile);
+    auto keyboard = EpaperEvdevKeyboardHandler::create(deviceNode, m_spec, m_defaultKeymapFile);
     if (keyboard) {
         m_keyboards.add(deviceNode, std::move(keyboard));
         updateDeviceCount();
@@ -101,7 +133,7 @@ void QEvdevKeyboardManager::addKeyboard(const QString &deviceNode)
     }
 }
 
-void QEvdevKeyboardManager::removeKeyboard(const QString &deviceNode)
+void EpaperEvdevKeyboardManager::removeKeyboard(const QString &deviceNode)
 {
     if (m_keyboards.remove(deviceNode)) {
         qCDebug(qLcEvdevKey, "Removing keyboard at %ls", qUtf16Printable(deviceNode));
@@ -109,12 +141,12 @@ void QEvdevKeyboardManager::removeKeyboard(const QString &deviceNode)
     }
 }
 
-void QEvdevKeyboardManager::updateDeviceCount()
+void EpaperEvdevKeyboardManager::updateDeviceCount()
 {
     QInputDeviceManagerPrivate::get(QGuiApplicationPrivate::inputDeviceManager())->setDeviceCount(QInputDeviceManager::DeviceTypeKeyboard, m_keyboards.count());
 }
 
-void QEvdevKeyboardManager::loadKeymap(const QString &file)
+void EpaperEvdevKeyboardManager::loadKeymap(const QString &file)
 {
     m_defaultKeymapFile = file;
 
@@ -139,7 +171,7 @@ void QEvdevKeyboardManager::loadKeymap(const QString &file)
     }
 }
 
-void QEvdevKeyboardManager::switchLang()
+void EpaperEvdevKeyboardManager::switchLang()
 {
     for (const auto &keyboard : m_keyboards)
         keyboard.handler->switchLang();

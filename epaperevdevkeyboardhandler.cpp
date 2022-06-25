@@ -37,7 +37,7 @@
 **
 ****************************************************************************/
 
-#include "qevdevkeyboardhandler_p.h"
+#include "epaperevdevkeyboardhandler.h"
 
 #include <qplatformdefs.h>
 
@@ -68,26 +68,26 @@
 
 QT_BEGIN_NAMESPACE
 
-Q_LOGGING_CATEGORY(qLcEvdevKey, "qt.qpa.input")
-Q_LOGGING_CATEGORY(qLcEvdevKeyMap, "qt.qpa.input.keymap")
+Q_LOGGING_CATEGORY(EpaperEvdevKeyboardLog, "rm.epaperkeyboardhandler")
+Q_LOGGING_CATEGORY(EpaperEvdevKeyboardMapLog, "rm.epaperkeyboardhandler.map")
 
 // simple builtin US keymap
-#include "qevdevkeyboard_defaultmap_p.h"
+#include "epaperevdevkeyboard_defaultmap.h"
 
-void QFdContainer::reset() noexcept
+void EpaperEvdevFdContainer::reset() noexcept
 {
     if (m_fd >= 0)
         qt_safe_close(m_fd);
     m_fd = -1;
 }
 
-QEvdevKeyboardHandler::QEvdevKeyboardHandler(const QString &device, QFdContainer &fd, bool disableZap, bool enableCompose, const QString &keymapFile) :
+EpaperEvdevKeyboardHandler::EpaperEvdevKeyboardHandler(const QString &device, EpaperEvdevFdContainer &fd, bool disableZap, bool enableCompose, const QString &keymapFile) :
     m_device(device), m_fd(fd.release()), m_notify(nullptr),
     m_modifiers(0), m_composing(0), m_dead_unicode(0xffff),
     m_langLock(0), m_no_zap(disableZap), m_do_compose(enableCompose),
     m_keymap(0), m_keymap_size(0), m_keycompose(0), m_keycompose_size(0)
 {
-    qCDebug(qLcEvdevKey) << "Create keyboard handler with for device" << device;
+    qCDebug(EpaperEvdevKeyboardLog) << "Create keyboard handler with for device" << device;
 
     setObjectName(QLatin1String("LinuxInput Keyboard Handler"));
 
@@ -98,19 +98,19 @@ QEvdevKeyboardHandler::QEvdevKeyboardHandler(const QString &device, QFdContainer
 
     // socket notifier for events on the keyboard device
     m_notify = new QSocketNotifier(m_fd.get(), QSocketNotifier::Read, this);
-    connect(m_notify, &QSocketNotifier::activated, this, &QEvdevKeyboardHandler::readKeycode);
+    connect(m_notify, &QSocketNotifier::activated, this, &EpaperEvdevKeyboardHandler::readKeycode);
 }
 
-QEvdevKeyboardHandler::~QEvdevKeyboardHandler()
+EpaperEvdevKeyboardHandler::~EpaperEvdevKeyboardHandler()
 {
     unloadKeymap();
 }
 
-std::unique_ptr<QEvdevKeyboardHandler> QEvdevKeyboardHandler::create(const QString &device,
-                                                                     const QString &specification,
-                                                                     const QString &defaultKeymapFile)
+std::unique_ptr<EpaperEvdevKeyboardHandler> EpaperEvdevKeyboardHandler::create(const QString &device,
+                                                                               const QString &specification,
+                                                                               const QString &defaultKeymapFile)
 {
-    qCDebug(qLcEvdevKey, "Try to create keyboard handler for \"%ls\" \"%ls\"",
+    qCDebug(EpaperEvdevKeyboardLog, "Try to create keyboard handler for \"%ls\" \"%ls\"",
             qUtf16Printable(device), qUtf16Printable(specification));
 
     QString keymapFile = defaultKeymapFile;
@@ -136,9 +136,9 @@ std::unique_ptr<QEvdevKeyboardHandler> QEvdevKeyboardHandler::create(const QStri
             grab = arg.mid(5).toInt();
     }
 
-    qCDebug(qLcEvdevKey, "Opening keyboard at %ls", qUtf16Printable(device));
+    qCDebug(EpaperEvdevKeyboardLog, "Opening keyboard at %ls", qUtf16Printable(device));
 
-    QFdContainer fd(qt_safe_open(device.toLocal8Bit().constData(), O_RDONLY | O_NDELAY, 0));
+    EpaperEvdevFdContainer fd(qt_safe_open(device.toLocal8Bit().constData(), O_RDONLY | O_NDELAY, 0));
     if (fd.get() >= 0) {
         ::ioctl(fd.get(), EVIOCGRAB, grab);
         if (repeatDelay > 0 && repeatRate > 0) {
@@ -146,16 +146,16 @@ std::unique_ptr<QEvdevKeyboardHandler> QEvdevKeyboardHandler::create(const QStri
             ::ioctl(fd.get(), EVIOCSREP, kbdrep);
         }
 
-        return std::unique_ptr<QEvdevKeyboardHandler>(new QEvdevKeyboardHandler(device, fd, disableZap, enableCompose, keymapFile));
+        return std::unique_ptr<EpaperEvdevKeyboardHandler>(new EpaperEvdevKeyboardHandler(device, fd, disableZap, enableCompose, keymapFile));
     } else {
         qErrnoWarning("Cannot open keyboard input device '%ls'", qUtf16Printable(device));
         return nullptr;
     }
 }
 
-void QEvdevKeyboardHandler::switchLed(int led, bool state)
+void EpaperEvdevKeyboardHandler::switchLed(int led, bool state)
 {
-    qCDebug(qLcEvdevKey, "switchLed %d %d", led, int(state));
+    qCDebug(EpaperEvdevKeyboardLog, "switchLed %d %d", led, int(state));
 
     struct timeval tv;
     ::gettimeofday(&tv, 0);
@@ -169,7 +169,7 @@ void QEvdevKeyboardHandler::switchLed(int led, bool state)
     qt_safe_write(m_fd.get(), &led_ie, sizeof(led_ie));
 }
 
-void QEvdevKeyboardHandler::readKeycode()
+void EpaperEvdevKeyboardHandler::readKeycode()
 {
     struct ::input_event buffer[32];
     int n = 0;
@@ -208,23 +208,23 @@ void QEvdevKeyboardHandler::readKeycode()
         quint16 code = buffer[i].code;
         qint32 value = buffer[i].value;
 
-        QEvdevKeyboardHandler::KeycodeAction ka;
+        EpaperEvdevKeyboardHandler::KeycodeAction ka;
         ka = processKeycode(code, value != 0, value == 2);
 
         switch (ka) {
-        case QEvdevKeyboardHandler::CapsLockOn:
-        case QEvdevKeyboardHandler::CapsLockOff:
-            switchLed(LED_CAPSL, ka == QEvdevKeyboardHandler::CapsLockOn);
+        case EpaperEvdevKeyboardHandler::CapsLockOn:
+        case EpaperEvdevKeyboardHandler::CapsLockOff:
+            switchLed(LED_CAPSL, ka == EpaperEvdevKeyboardHandler::CapsLockOn);
             break;
 
-        case QEvdevKeyboardHandler::NumLockOn:
-        case QEvdevKeyboardHandler::NumLockOff:
-            switchLed(LED_NUML, ka == QEvdevKeyboardHandler::NumLockOn);
+        case EpaperEvdevKeyboardHandler::NumLockOn:
+        case EpaperEvdevKeyboardHandler::NumLockOff:
+            switchLed(LED_NUML, ka == EpaperEvdevKeyboardHandler::NumLockOn);
             break;
 
-        case QEvdevKeyboardHandler::ScrollLockOn:
-        case QEvdevKeyboardHandler::ScrollLockOff:
-            switchLed(LED_SCROLLL, ka == QEvdevKeyboardHandler::ScrollLockOn);
+        case EpaperEvdevKeyboardHandler::ScrollLockOn:
+        case EpaperEvdevKeyboardHandler::ScrollLockOff:
+            switchLed(LED_SCROLLL, ka == EpaperEvdevKeyboardHandler::ScrollLockOn);
             break;
 
         default:
@@ -234,58 +234,58 @@ void QEvdevKeyboardHandler::readKeycode()
     }
 }
 
-void QEvdevKeyboardHandler::processKeyEvent(int nativecode, int unicode, int qtcode,
-                                            Qt::KeyboardModifiers modifiers, bool isPress, bool autoRepeat)
+void EpaperEvdevKeyboardHandler::processKeyEvent(int nativecode, int unicode, int qtcode,
+                                                 Qt::KeyboardModifiers modifiers, bool isPress, bool autoRepeat)
 {
     if (!autoRepeat)
-        QGuiApplicationPrivate::inputDeviceManager()->setKeyboardModifiers(QEvdevKeyboardHandler::toQtModifiers(m_modifiers));
+        QGuiApplicationPrivate::inputDeviceManager()->setKeyboardModifiers(EpaperEvdevKeyboardHandler::toQtModifiers(m_modifiers));
 
     QWindowSystemInterface::handleExtendedKeyEvent(0, (isPress ? QEvent::KeyPress : QEvent::KeyRelease),
                                                    qtcode, modifiers, nativecode + 8, 0, int(modifiers),
                                                    (unicode != 0xffff) ? QString(QChar(unicode)) : QString(), autoRepeat);
 }
 
-QEvdevKeyboardHandler::KeycodeAction QEvdevKeyboardHandler::processKeycode(quint16 keycode, bool pressed, bool autorepeat)
+EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKeycode(quint16 keycode, bool pressed, bool autorepeat)
 {
     KeycodeAction result = None;
     bool first_press = pressed && !autorepeat;
 
-    const QEvdevKeyboardMap::Mapping *map_plain = 0;
-    const QEvdevKeyboardMap::Mapping *map_withmod = 0;
+    const EpaperEvdevKeyboardMap::Mapping *map_plain = 0;
+    const EpaperEvdevKeyboardMap::Mapping *map_withmod = 0;
 
     quint8 modifiers = m_modifiers;
 
     // get a specific and plain mapping for the keycode and the current modifiers
     for (int i = 0; i < m_keymap_size && !(map_plain && map_withmod); ++i) {
-        const QEvdevKeyboardMap::Mapping *m = m_keymap + i;
+        const EpaperEvdevKeyboardMap::Mapping *m = m_keymap + i;
         if (m->keycode == keycode) {
             if (m->modifiers == 0)
                 map_plain = m;
 
             quint8 testmods = m_modifiers;
-            if (m_locks[0] /*CapsLock*/ && (m->flags & QEvdevKeyboardMap::IsLetter))
-                testmods ^= QEvdevKeyboardMap::ModShift;
+            if (m_locks[0] /*CapsLock*/ && (m->flags & EpaperEvdevKeyboardMap::IsLetter))
+                testmods ^= EpaperEvdevKeyboardMap::ModShift;
             if (m_langLock)
-                testmods ^= QEvdevKeyboardMap::ModAltGr;
+                testmods ^= EpaperEvdevKeyboardMap::ModAltGr;
             if (m->modifiers == testmods)
                 map_withmod = m;
         }
     }
 
-    if (m_locks[0] /*CapsLock*/ && map_withmod && (map_withmod->flags & QEvdevKeyboardMap::IsLetter))
-        modifiers ^= QEvdevKeyboardMap::ModShift;
+    if (m_locks[0] /*CapsLock*/ && map_withmod && (map_withmod->flags & EpaperEvdevKeyboardMap::IsLetter))
+        modifiers ^= EpaperEvdevKeyboardMap::ModShift;
 
-    qCDebug(qLcEvdevKeyMap, "Processing key event: keycode=%3d, modifiers=%02x pressed=%d, autorepeat=%d  |  plain=%d, withmod=%d, size=%d",
+    qCDebug(EpaperEvdevKeyboardMapLog, "Processing key event: keycode=%3d, modifiers=%02x pressed=%d, autorepeat=%d  |  plain=%d, withmod=%d, size=%d",
             keycode, modifiers, pressed ? 1 : 0, autorepeat ? 1 : 0,
             int(map_plain ? map_plain - m_keymap : -1),
             int(map_withmod ? map_withmod - m_keymap : -1),
             m_keymap_size);
 
-    const QEvdevKeyboardMap::Mapping *it = map_withmod ? map_withmod : map_plain;
+    const EpaperEvdevKeyboardMap::Mapping *it = map_withmod ? map_withmod : map_plain;
 
     if (!it) {
         // we couldn't even find a plain mapping
-        qCDebug(qLcEvdevKeyMap, "Could not find a suitable mapping for keycode: %3d, modifiers: %02x", keycode, modifiers);
+        qCDebug(EpaperEvdevKeyboardMapLog, "Could not find a suitable mapping for keycode: %3d, modifiers: %02x", keycode, modifiers);
         return result;
     }
 
@@ -293,7 +293,7 @@ QEvdevKeyboardHandler::KeycodeAction QEvdevKeyboardHandler::processKeycode(quint
     quint16 unicode = it->unicode;
     quint32 qtcode = it->qtcode;
 
-    if ((it->flags & QEvdevKeyboardMap::IsModifier) && it->special) {
+    if ((it->flags & EpaperEvdevKeyboardMap::IsModifier) && it->special) {
         // this is a modifier, i.e. Shift, Alt, ...
         if (pressed)
             m_modifiers |= quint8(it->special);
@@ -319,28 +319,28 @@ QEvdevKeyboardHandler::KeycodeAction QEvdevKeyboardHandler::processKeycode(quint
                 break;
             }
         }
-    } else if ((it->flags & QEvdevKeyboardMap::IsSystem) && it->special && first_press) {
+    } else if ((it->flags & EpaperEvdevKeyboardMap::IsSystem) && it->special && first_press) {
         switch (it->special) {
-        case QEvdevKeyboardMap::SystemReboot:
+        case EpaperEvdevKeyboardMap::SystemReboot:
             result = Reboot;
             break;
 
-        case QEvdevKeyboardMap::SystemZap:
+        case EpaperEvdevKeyboardMap::SystemZap:
             if (!m_no_zap)
                 qApp->quit();
             break;
 
-        case QEvdevKeyboardMap::SystemConsolePrevious:
+        case EpaperEvdevKeyboardMap::SystemConsolePrevious:
             result = PreviousConsole;
             break;
 
-        case QEvdevKeyboardMap::SystemConsoleNext:
+        case EpaperEvdevKeyboardMap::SystemConsoleNext:
             result = NextConsole;
             break;
 
         default:
-            if (it->special >= QEvdevKeyboardMap::SystemConsoleFirst && it->special <= QEvdevKeyboardMap::SystemConsoleLast) {
-                result = KeycodeAction(SwitchConsoleFirst + ((it->special & QEvdevKeyboardMap::SystemConsoleMask) & SwitchConsoleMask));
+            if (it->special >= EpaperEvdevKeyboardMap::SystemConsoleFirst && it->special <= EpaperEvdevKeyboardMap::SystemConsoleLast) {
+                result = KeycodeAction(SwitchConsoleFirst + ((it->special & EpaperEvdevKeyboardMap::SystemConsoleMask) & SwitchConsoleMask));
             }
             break;
         }
@@ -351,7 +351,7 @@ QEvdevKeyboardHandler::KeycodeAction QEvdevKeyboardHandler::processKeycode(quint
         if (first_press)
             m_composing = 2;
         skip = true;
-    } else if ((it->flags & QEvdevKeyboardMap::IsDead) && m_do_compose) {
+    } else if ((it->flags & EpaperEvdevKeyboardMap::IsDead) && m_do_compose) {
         // a Dead key was pressed
         if (first_press && m_composing == 1 && m_dead_unicode == unicode) { // twice
             m_composing = 0;
@@ -373,10 +373,10 @@ QEvdevKeyboardHandler::KeycodeAction QEvdevKeyboardHandler::processKeycode(quint
         // or that mapping didn't have special modifiers:
         // so just report the plain mapping with additional modifiers.
         if ((it == map_plain && it != map_withmod) || (map_withmod && !(map_withmod->qtcode & modmask))) {
-            qtcode |= QEvdevKeyboardHandler::toQtModifiers(modifiers);
+            qtcode |= EpaperEvdevKeyboardHandler::toQtModifiers(modifiers);
         }
 
-        if (m_composing == 2 && first_press && !(it->flags & QEvdevKeyboardMap::IsModifier)) {
+        if (m_composing == 2 && first_press && !(it->flags & EpaperEvdevKeyboardMap::IsModifier)) {
             // the last key press was the Compose key
             if (unicode != 0xffff) {
                 int idx = 0;
@@ -397,7 +397,7 @@ QEvdevKeyboardHandler::KeycodeAction QEvdevKeyboardHandler::processKeycode(quint
             } else {
                 m_composing = 0;
             }
-        } else if (m_composing == 1 && first_press && !(it->flags & QEvdevKeyboardMap::IsModifier)) {
+        } else if (m_composing == 1 && first_press && !(it->flags & EpaperEvdevKeyboardMap::IsModifier)) {
             // the last key press was a Dead key
             bool valid = false;
             if (unicode != 0xffff) {
@@ -430,7 +430,7 @@ QEvdevKeyboardHandler::KeycodeAction QEvdevKeyboardHandler::processKeycode(quint
 
             // qtmods here is the modifier state before the event, i.e. not
             // including the current key in case it is a modifier.
-            qCDebug(qLcEvdevKeyMap, "Processing: uni=%04x, qt=%08x, qtmod=%08x", unicode, qtcode, int(qtmods));
+            qCDebug(EpaperEvdevKeyboardMapLog, "Processing: uni=%04x, qt=%08x, qtmod=%08x", unicode, qtcode, int(qtmods));
 
             // If NumLockOff and keypad key pressed remap event sent
             if (!m_locks[1] && (qtmods & Qt::KeypadModifier) && keycode >= 71 && keycode <= 83 && keycode != 74 && keycode != 78) {
@@ -484,9 +484,9 @@ QEvdevKeyboardHandler::KeycodeAction QEvdevKeyboardHandler::processKeycode(quint
     return result;
 }
 
-void QEvdevKeyboardHandler::unloadKeymap()
+void EpaperEvdevKeyboardHandler::unloadKeymap()
 {
-    qCDebug(qLcEvdevKey, "Unload current keymap and restore built-in");
+    qCDebug(EpaperEvdevKeyboardLog, "Unload current keymap and restore built-in");
 
     if (m_keymap && m_keymap != s_keymap_default)
         delete[] m_keymap;
@@ -522,15 +522,15 @@ void QEvdevKeyboardHandler::unloadKeymap()
         // Scrollock
         if ((ledbits[0] & 0x04) > 0)
             m_locks[2] = 1;
-        qCDebug(qLcEvdevKey, "numlock=%d , capslock=%d, scrolllock=%d", m_locks[1], m_locks[0], m_locks[2]);
+        qCDebug(EpaperEvdevKeyboardLog, "numlock=%d , capslock=%d, scrolllock=%d", m_locks[1], m_locks[0], m_locks[2]);
     }
 
     m_langLock = 0;
 }
 
-bool QEvdevKeyboardHandler::loadKeymap(const QString &file)
+bool EpaperEvdevKeyboardHandler::loadKeymap(const QString &file)
 {
-    qCDebug(qLcEvdevKey, "Loading keymap %ls", qUtf16Printable(file));
+    qCDebug(EpaperEvdevKeyboardLog, "Loading keymap %ls", qUtf16Printable(file));
 
     QFile f(file);
 
@@ -553,13 +553,13 @@ bool QEvdevKeyboardHandler::loadKeymap(const QString &file)
 
     ds >> qmap_magic >> qmap_version >> qmap_keymap_size >> qmap_keycompose_size;
 
-    if (ds.status() != QDataStream::Ok || qmap_magic != QEvdevKeyboardMap::FileMagic || qmap_version != 1 || qmap_keymap_size == 0) {
+    if (ds.status() != QDataStream::Ok || qmap_magic != EpaperEvdevKeyboardMap::FileMagic || qmap_version != 1 || qmap_keymap_size == 0) {
         qWarning("'%ls' is not a valid .qmap keymap file", qUtf16Printable(file));
         return false;
     }
 
-    QEvdevKeyboardMap::Mapping *qmap_keymap = new QEvdevKeyboardMap::Mapping[qmap_keymap_size];
-    QEvdevKeyboardMap::Composing *qmap_keycompose = qmap_keycompose_size ? new QEvdevKeyboardMap::Composing[qmap_keycompose_size] : 0;
+    EpaperEvdevKeyboardMap::Mapping *qmap_keymap = new EpaperEvdevKeyboardMap::Mapping[qmap_keymap_size];
+    EpaperEvdevKeyboardMap::Composing *qmap_keycompose = qmap_keycompose_size ? new EpaperEvdevKeyboardMap::Composing[qmap_keycompose_size] : 0;
 
     for (quint32 i = 0; i < qmap_keymap_size; ++i)
         ds >> qmap_keymap[i];
@@ -587,7 +587,7 @@ bool QEvdevKeyboardHandler::loadKeymap(const QString &file)
     return true;
 }
 
-void QEvdevKeyboardHandler::switchLang()
+void EpaperEvdevKeyboardHandler::switchLang()
 {
     m_langLock ^= 1;
 }

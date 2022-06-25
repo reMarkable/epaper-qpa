@@ -37,8 +37,7 @@
 **
 ****************************************************************************/
 
-#ifndef QEVDEVKEYBOARDMANAGER_P_H
-#define QEVDEVKEYBOARDMANAGER_P_H
+#pragma once
 
 //
 //  W A R N I N G
@@ -51,7 +50,7 @@
 // We mean it.
 //
 
-#include "qevdevkeyboardhandler_p.h"
+#include "epaperevdevkeyboardhandler.h"
 
 #include <QtDeviceDiscoverySupport/private/qdevicediscovery_p.h>
 #include <QtInputSupport/private/devicehandlerlist_p.h>
@@ -62,11 +61,11 @@
 
 QT_BEGIN_NAMESPACE
 
-class QEvdevKeyboardManager : public QObject
+class EpaperEvdevKeyboardManager : public QObject
 {
 public:
-    QEvdevKeyboardManager(const QString &key, const QString &specification, QObject *parent = nullptr);
-    ~QEvdevKeyboardManager();
+    EpaperEvdevKeyboardManager(const QString &key, const QString &specification, QObject *parent = nullptr);
+    ~EpaperEvdevKeyboardManager();
 
     void loadKeymap(const QString &file);
     void switchLang();
@@ -78,10 +77,8 @@ private:
     void updateDeviceCount();
 
     QString m_spec;
-    QtInputSupport::DeviceHandlerList<QEvdevKeyboardHandler> m_keyboards;
+    QtInputSupport::DeviceHandlerList<EpaperEvdevKeyboardHandler> m_keyboards;
     QString m_defaultKeymapFile;
 };
 
 QT_END_NAMESPACE
-
-#endif // QEVDEVKEYBOARDMANAGER_P_H
