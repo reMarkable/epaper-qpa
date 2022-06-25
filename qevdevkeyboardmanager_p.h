@@ -53,11 +53,11 @@
 
 #include "qevdevkeyboardhandler_p.h"
 
-#include <QtInputSupport/private/devicehandlerlist_p.h>
 #include <QtDeviceDiscoverySupport/private/qdevicediscovery_p.h>
+#include <QtInputSupport/private/devicehandlerlist_p.h>
 
-#include <QObject>
 #include <QHash>
+#include <QObject>
 #include <QSocketNotifier>
 
 QT_BEGIN_NAMESPACE

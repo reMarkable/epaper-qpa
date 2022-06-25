@@ -51,9 +51,9 @@
 // We mean it.
 //
 
-#include <qobject.h>
-#include <QTimer>
 #include <QDataStream>
+#include <QTimer>
+#include <qobject.h>
 
 #include <memory>
 
@@ -62,53 +62,54 @@ QT_BEGIN_NAMESPACE
 class QSocketNotifier;
 
 namespace QEvdevKeyboardMap {
-    const quint32 FileMagic = 0x514d4150; // 'QMAP'
+const quint32 FileMagic = 0x514d4150; // 'QMAP'
 
-    struct Mapping {
-        quint16 keycode;
-        quint16 unicode;
-        quint32 qtcode;
-        quint8 modifiers;
-        quint8 flags;
-        quint16 special;
+struct Mapping
+{
+    quint16 keycode;
+    quint16 unicode;
+    quint32 qtcode;
+    quint8 modifiers;
+    quint8 flags;
+    quint16 special;
+};
 
-    };
+enum Flags {
+    IsDead = 0x01,
+    IsLetter = 0x02,
+    IsModifier = 0x04,
+    IsSystem = 0x08
+};
 
-    enum Flags {
-        IsDead     = 0x01,
-        IsLetter   = 0x02,
-        IsModifier = 0x04,
-        IsSystem   = 0x08
-    };
+enum System {
+    SystemConsoleFirst = 0x0100,
+    SystemConsoleMask = 0x007f,
+    SystemConsoleLast = 0x017f,
+    SystemConsolePrevious = 0x0180,
+    SystemConsoleNext = 0x0181,
+    SystemReboot = 0x0200,
+    SystemZap = 0x0300
+};
 
-    enum System {
-        SystemConsoleFirst    = 0x0100,
-        SystemConsoleMask     = 0x007f,
-        SystemConsoleLast     = 0x017f,
-        SystemConsolePrevious = 0x0180,
-        SystemConsoleNext     = 0x0181,
-        SystemReboot          = 0x0200,
-        SystemZap             = 0x0300
-    };
+struct Composing
+{
+    quint16 first;
+    quint16 second;
+    quint16 result;
+};
 
-    struct Composing {
-        quint16 first;
-        quint16 second;
-        quint16 result;
-    };
-
-    enum Modifiers {
-        ModPlain   = 0x00,
-        ModShift   = 0x01,
-        ModAltGr   = 0x02,
-        ModControl = 0x04,
-        ModAlt     = 0x08,
-        ModShiftL  = 0x10,
-        ModShiftR  = 0x20,
-        ModCtrlL   = 0x40,
-        ModCtrlR   = 0x80
-        // ModCapsShift = 0x100, // not supported!
-    };
+enum Modifiers {
+    ModPlain = 0x00,
+    ModShift = 0x01,
+    ModAltGr = 0x02,
+    ModControl = 0x04,
+    ModAlt = 0x08,
+    ModShiftL = 0x10,
+    ModShiftR = 0x20,
+    ModCtrlL = 0x40,
+    ModCtrlR = 0x80
+    // ModCapsShift = 0x100, // not supported!
+};
 }
 
 inline QDataStream &operator>>(QDataStream &ds, QEvdevKeyboardMap::Mapping &m)
@@ -135,13 +136,20 @@ class QFdContainer
 {
     int m_fd;
     Q_DISABLE_COPY_MOVE(QFdContainer);
+
 public:
-    explicit QFdContainer(int fd = -1) noexcept : m_fd(fd) {}
+    explicit QFdContainer(int fd = -1) noexcept :
+        m_fd(fd) { }
     ~QFdContainer() { reset(); }
 
     int get() const noexcept { return m_fd; }
 
-    int release() noexcept { int result = m_fd; m_fd = -1; return result; }
+    int release() noexcept
+    {
+        int result = m_fd;
+        m_fd = -1;
+        return result;
+    }
     void reset() noexcept;
 };
 
@@ -152,27 +160,27 @@ public:
     ~QEvdevKeyboardHandler();
 
     enum KeycodeAction {
-        None               = 0,
+        None = 0,
 
-        CapsLockOff        = 0x01000000,
-        CapsLockOn         = 0x01000001,
-        NumLockOff         = 0x02000000,
-        NumLockOn          = 0x02000001,
-        ScrollLockOff      = 0x03000000,
-        ScrollLockOn       = 0x03000001,
+        CapsLockOff = 0x01000000,
+        CapsLockOn = 0x01000001,
+        NumLockOff = 0x02000000,
+        NumLockOn = 0x02000001,
+        ScrollLockOff = 0x03000000,
+        ScrollLockOn = 0x03000001,
 
-        Reboot             = 0x04000000,
+        Reboot = 0x04000000,
 
-        PreviousConsole    = 0x05000000,
-        NextConsole        = 0x05000001,
+        PreviousConsole = 0x05000000,
+        NextConsole = 0x05000001,
         SwitchConsoleFirst = 0x06000000,
-        SwitchConsoleLast  = 0x0600007f,
-        SwitchConsoleMask  = 0x0000007f
+        SwitchConsoleLast = 0x0600007f,
+        SwitchConsoleMask = 0x0000007f
     };
 
     static std::unique_ptr<QEvdevKeyboardHandler> create(const QString &device,
-                                         const QString &specification,
-                                         const QString &defaultKeymapFile = QString());
+                                                         const QString &specification,
+                                                         const QString &defaultKeymapFile = QString());
 
     static Qt::KeyboardModifiers toQtModifiers(quint8 mod)
     {
@@ -223,7 +231,6 @@ private:
     static const QEvdevKeyboardMap::Mapping s_keymap_default[];
     static const QEvdevKeyboardMap::Composing s_keycompose_default[];
 };
-
 
 QT_END_NAMESPACE
 

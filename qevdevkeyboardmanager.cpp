@@ -41,9 +41,9 @@
 
 #include <QtInputSupport/private/qevdevutil_p.h>
 
-#include <QStringList>
 #include <QCoreApplication>
 #include <QLoggingCategory>
+#include <QStringList>
 
 #include <private/qguiapplication_p.h>
 #include <private/qinputdevicemanager_p_p.h>
@@ -52,11 +52,10 @@ QT_BEGIN_NAMESPACE
 
 Q_DECLARE_LOGGING_CATEGORY(qLcEvdevKey)
 
-QEvdevKeyboardManager::QEvdevKeyboardManager(const QString &key, const QString &specification, QObject *parent)
-    : QObject(parent)
+QEvdevKeyboardManager::QEvdevKeyboardManager(const QString &key, const QString &specification, QObject *parent) :
+    QObject(parent)
 {
     Q_UNUSED(key);
-
 
     QString spec = QString::fromLocal8Bit(qgetenv("QT_QPA_EVDEV_KEYBOARD_PARAMETERS"));
 
@@ -112,8 +111,7 @@ void QEvdevKeyboardManager::removeKeyboard(const QString &deviceNode)
 
 void QEvdevKeyboardManager::updateDeviceCount()
 {
-    QInputDeviceManagerPrivate::get(QGuiApplicationPrivate::inputDeviceManager())->setDeviceCount(
-        QInputDeviceManager::DeviceTypeKeyboard, m_keyboards.count());
+    QInputDeviceManagerPrivate::get(QGuiApplicationPrivate::inputDeviceManager())->setDeviceCount(QInputDeviceManager::DeviceTypeKeyboard, m_keyboards.count());
 }
 
 void QEvdevKeyboardManager::loadKeymap(const QString &file)
