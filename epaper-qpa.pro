@@ -7,9 +7,14 @@ QT += core-private gui-private input_support-private fontdatabase_support-privat
 
 SOURCES =   main.cpp \
             epaperintegration.cpp \
-            epaperbackingstore.cpp
+            epaperbackingstore.cpp \
+            epaperevdevkeyboardhandler.cpp \
+            epaperevdevkeyboardmanager.cpp
 HEADERS =   epaperintegration.h \
-            epaperbackingstore.h
+            epaperbackingstore.h \
+            epaperevdevkeyboard_defaultmap.h \
+            epaperevdevkeyboardhandler.h \
+            epaperevdevkeyboardmanager.h
 
 OTHER_FILES += minimal.json
 
