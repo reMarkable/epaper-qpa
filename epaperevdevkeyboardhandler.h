@@ -63,13 +63,32 @@ class QSocketNotifier;
 namespace EpaperEvdevKeyboardMap {
 const quint32 FileMagic = 0x514d4150; // 'QMAP'
 
+// A Mapping encodes a way to go from an evdev keycode (and set of modifiers) to a
+// Qt key, and perhaps a special action, etc.
+//
+// Keys are "mapped" from evdev to Qt events, by checking the evdev's keycode against
+// that of the mapping, along with checking the currently-applied modifiers against that of the mapping.
 struct Mapping
 {
+    // The key reported by the kernel, used to match events.
     quint16 keycode;
+
+    // This is used populate QKeyEvent::text, if not 0xffff (compose related?)
     quint16 unicode;
+
+    // Maps to Qt::Key
     quint32 qtcode;
+
+    // Modifiers for the key, used to match events.
+    // If 0, then this is a plain key mapping.
+    // Otherwise, the modifiers on the mapping must be set for this mapping to match
     quint8 modifiers;
+
+    // See the Flags enum below
     quint8 flags;
+
+    // If IsSystem, then it's the special action for this mapping. See the System enum below.
+    // If IsModifier, then the special value is used to alter the currently pressed modifiers.
     quint16 special;
 };
 
