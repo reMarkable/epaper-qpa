@@ -35,7 +35,10 @@
 #define QPLATFORMINTEGRATION_EPAPER_H
 
 #include <qpa/qplatformintegration.h>
+#include <qpa/qplatformnativeinterface.h>
 #include <qpa/qplatformscreen.h>
+
+#include <QPointer>
 
 QT_BEGIN_NAMESPACE
 
@@ -61,10 +64,10 @@ public:
     QSize mPhysicalSize;
 };
 
-class EpaperIntegration : public QObject, public QPlatformIntegration
-{
-    Q_OBJECT
+class EpaperEvdevKeyboardManager;
 
+class EpaperIntegration : public QPlatformIntegration, public QPlatformNativeInterface
+{
 public:
     explicit EpaperIntegration(const QStringList &parameters);
     ~EpaperIntegration();
@@ -78,12 +81,17 @@ public:
     QPlatformWindow *createPlatformWindow(QWindow *window) const override;
     QPlatformBackingStore *createPlatformBackingStore(QWindow *window) const override;
     QAbstractEventDispatcher *createEventDispatcher() const override;
+    QPlatformNativeInterface *nativeInterface() const override;
+    QFunctionPointer platformFunction(const QByteArray &function) const override;
 
     static EpaperIntegration *instance();
 
 private:
+    static void seabirdConnectionChangedStatic();
+
     mutable QPlatformFontDatabase *m_fontDatabase;
     QPlatformInputContext *m_inputContext;
+    QPointer<EpaperEvdevKeyboardManager> m_keyboardManager;
 };
 
 QT_END_NAMESPACE

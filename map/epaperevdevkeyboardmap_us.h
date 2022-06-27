@@ -57,9 +57,11 @@
 #include "linux/input.h"
 #endif
 
+using namespace EpaperEvdevKeyboardMap;
+
 // no QT_BEGIN_NAMESPACE, since we include it internally...
 
-const EpaperEvdevKeyboardMap::Mapping EpaperEvdevKeyboardHandler::s_keymap_default[] = {
+const EpaperEvdevKeyboardMap::Mapping s_keymap_us[] = {
     { 1, 0xffff, 0x01000000, 0x00, 0x00, 0x0000 },
     { 2, 0x0031, 0x00000031, 0x00, 0x00, 0x0000 },
     { 2, 0x0021, 0x00000021, 0x01, 0x00, 0x0000 },
@@ -677,7 +679,7 @@ const EpaperEvdevKeyboardMap::Mapping EpaperEvdevKeyboardHandler::s_keymap_defau
     { KEY_CHANNELDOWN, 0xffff, Qt::Key_ChannelDown, 0x00, 0x00, 0x0000 },
 };
 
-const EpaperEvdevKeyboardMap::Composing EpaperEvdevKeyboardHandler::s_keycompose_default[] = {
+const EpaperEvdevKeyboardMap::Composing s_keycompose_us[] = {
     { 0x0060, 0x0041, 0x00c0 },
     { 0x0060, 0x0061, 0x00e0 },
     { 0x0027, 0x0041, 0x00c1 },

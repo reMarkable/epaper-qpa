@@ -204,6 +204,7 @@ public:
     {
         Qt::KeyboardModifiers qtmod = Qt::NoModifier;
 
+        // FIXME: These will probably have to respect the keyboard flavour setting
         if (mod & (EpaperEvdevKeyboardMap::ModShift | EpaperEvdevKeyboardMap::ModShiftL | EpaperEvdevKeyboardMap::ModShiftR))
             qtmod |= Qt::ShiftModifier;
         if (mod & (EpaperEvdevKeyboardMap::ModControl | EpaperEvdevKeyboardMap::ModCtrlL | EpaperEvdevKeyboardMap::ModCtrlR))
@@ -238,13 +239,11 @@ private:
     bool m_no_zap;
     bool m_do_compose;
 
+    bool m_didLoadKeymap = false;
     const EpaperEvdevKeyboardMap::Mapping *m_keymap;
     int m_keymap_size;
     const EpaperEvdevKeyboardMap::Composing *m_keycompose;
     int m_keycompose_size;
-
-    static const EpaperEvdevKeyboardMap::Mapping s_keymap_default[];
-    static const EpaperEvdevKeyboardMap::Composing s_keycompose_default[];
 };
 
 QT_END_NAMESPACE
