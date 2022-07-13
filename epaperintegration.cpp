@@ -38,6 +38,7 @@
 #include <QtGui/private/qpixmap_raster_p.h>
 #include <qpa/qplatformfontdatabase.h>
 #include <qpa/qplatformwindow.h>
+#include <qpa/qplatforminputcontextfactory_p.h>
 
 #include <private/qevdevkeyboardmanager_p.h>
 #include <private/qevdevmousemanager_p.h>
@@ -49,7 +50,8 @@ QT_BEGIN_NAMESPACE
 
 EpaperIntegration::EpaperIntegration(const QStringList &parameters) :
     QObject(),
-    m_fontDatabase(0)
+    m_fontDatabase(0),
+    m_inputContext(0)
 {
     Q_UNUSED(parameters);
     EpaperScreen *mPrimaryScreen = new EpaperScreen();
@@ -86,6 +88,8 @@ void EpaperIntegration::initialize()
 {
     new QEvdevKeyboardManager(QLatin1String("EvdevKeyboard"), QString(), nullptr);
     new QEvdevTouchManager(QLatin1String("EvdevTouch"), QString() /* spec */, nullptr);
+
+    m_inputContext = QPlatformInputContextFactory::create();
 }
 
 QPlatformFontDatabase *EpaperIntegration::fontDatabase() const
@@ -94,6 +98,11 @@ QPlatformFontDatabase *EpaperIntegration::fontDatabase() const
         m_fontDatabase = new QGenericUnixFontDatabase();
     }
     return m_fontDatabase;
+}
+
+QPlatformInputContext *EpaperIntegration::inputContext() const
+{
+    return m_inputContext;
 }
 
 QPlatformWindow *EpaperIntegration::createPlatformWindow(QWindow *window) const
