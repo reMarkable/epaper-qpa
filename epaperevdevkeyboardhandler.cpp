@@ -482,9 +482,11 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
 // builtin keymaps
 #include "map/epaperevdevkeyboardmap_no.h"
 #include "map/epaperevdevkeyboardmap_us.h"
+#include "map/epaperevdevkeyboardmap_us_rm.h"
 
 enum class EpaperEvdevBuiltinKeymap {
     US,
+    US_RM,
     NO,
 };
 
@@ -492,13 +494,15 @@ static EpaperEvdevBuiltinKeymap determineKeymap()
 {
     QFile file("/sys/pogo/status/lang");
     if (!file.open(QIODevice::ReadOnly)) {
+        // No keyboard attached means we fall back to the (unaltered) US keymap.
         qCWarning(EpaperEvdevKeyboardLog) << "failed to open pogo lang status" << file.errorString();
-        return EpaperEvdevBuiltinKeymap::US; // FIXME: appropriate fallback?
+        return EpaperEvdevBuiltinKeymap::US;
     }
 
     QByteArray langCode = file.readAll();
     qCDebug(EpaperEvdevKeyboardLog) << "read a langCode of " << langCode;
     if (langCode.isEmpty()) {
+        // This shouldn't happen, but if it does, try to behave sensibly.
         qCWarning(EpaperEvdevKeyboardLog) << "langCode was empty, assuming US layout";
         return EpaperEvdevBuiltinKeymap::US;
     }
@@ -517,13 +521,13 @@ static EpaperEvdevBuiltinKeymap determineKeymap()
         // the setting should be, let's check it properly.
         return EpaperEvdevBuiltinKeymap::NO;
     } else if (langCode == "EN") {
-        return EpaperEvdevBuiltinKeymap::US;
+        return EpaperEvdevBuiltinKeymap::US_RM;
     }
 
     // FIXME: I expect other lang codes need handling, but they don't yet have layouts defined by us.
     // The kernel defines at least "FR" at present, see dev_language in pogo_sysfs.c.
     qCWarning(EpaperEvdevKeyboardLog) << "detected an unexpected langCode " << langCode << " - assuming US layout";
-    return EpaperEvdevBuiltinKeymap::US;
+    return EpaperEvdevBuiltinKeymap::US_RM;
 }
 
 void EpaperEvdevKeyboardHandler::unloadKeymap()
@@ -547,6 +551,13 @@ void EpaperEvdevKeyboardHandler::unloadKeymap()
         keycomposeFirst = s_keycompose_us;
         keycomposeSize = sizeof(s_keycompose_us) / sizeof(s_keycompose_us[0]);
         qCDebug(EpaperEvdevKeyboardLog) << "setting US keymap" << keymapSize << keycomposeSize;
+        break;
+    case EpaperEvdevBuiltinKeymap::US_RM:
+        keymapFirst = s_keymap_us_rm;
+        keymapSize = sizeof(s_keymap_us_rm) / sizeof(s_keymap_us_rm[0]);
+        keycomposeFirst = s_keycompose_us_rm;
+        keycomposeSize = sizeof(s_keycompose_us_rm) / sizeof(s_keycompose_us_rm[0]);
+        qCDebug(EpaperEvdevKeyboardLog) << "setting US (RM) keymap" << keymapSize << keycomposeSize;
         break;
     case EpaperEvdevBuiltinKeymap::NO:
         keymapFirst = s_keymap_no;

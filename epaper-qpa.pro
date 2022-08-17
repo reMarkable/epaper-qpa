@@ -12,9 +12,13 @@ SOURCES =   main.cpp \
             epaperevdevkeyboardmanager.cpp
 HEADERS =   epaperintegration.h \
             epaperbackingstore.h \
-            epaperevdevkeyboard_defaultmap.h \
             epaperevdevkeyboardhandler.h \
             epaperevdevkeyboardmanager.h
+
+HEADERS += \
+    map/epaperevdevkeyboardmap_no.h \
+    map/epaperevdevkeyboardmap_us.h \
+    map/epaperevdevkeyboardmap_us_rm.h
 
 OTHER_FILES += minimal.json
 
