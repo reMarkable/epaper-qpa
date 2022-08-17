@@ -83,11 +83,14 @@ public:
     QAbstractEventDispatcher *createEventDispatcher() const override;
     QPlatformNativeInterface *nativeInterface() const override;
     QFunctionPointer platformFunction(const QByteArray &function) const override;
+    void setCapsLockEnabled(bool enabled);
 
     static EpaperIntegration *instance();
 
 private:
     static void seabirdConnectionChangedStatic();
+    static void seabirdCapsLockEnableStatic();
+    static void seabirdCapsLockDisableStatic();
 
     mutable QPlatformFontDatabase *m_fontDatabase;
     QPlatformInputContext *m_inputContext;

@@ -130,9 +130,13 @@ QPlatformNativeInterface *EpaperIntegration::nativeInterface() const
 
 QFunctionPointer EpaperIntegration::platformFunction(const QByteArray &function) const
 {
-    // Don't change this string. It must agree with xochitl.
+    // Don't change these strings. They must agree with xochitl.
     if (function == "rm_seabirdConnectionChanged") {
         return QFunctionPointer(seabirdConnectionChangedStatic);
+    } else if (function == "rm_seabirdCapsLockEnable") {
+        return QFunctionPointer(seabirdCapsLockEnableStatic);
+    } else if (function == "rm_seabirdCapsLockDisable") {
+        return QFunctionPointer(seabirdCapsLockDisableStatic);
     }
 
     return nullptr;
@@ -140,11 +144,20 @@ QFunctionPointer EpaperIntegration::platformFunction(const QByteArray &function)
 
 void EpaperIntegration::seabirdConnectionChangedStatic()
 {
-    EpaperIntegration *self = static_cast<EpaperIntegration *>(QGuiApplicationPrivate::platformIntegration());
-    Q_ASSERT(self->m_keyboardManager);
-    if (self->m_keyboardManager) {
-        self->m_keyboardManager->loadKeymap(QString());
-    }
+    EpaperIntegration *self = EpaperIntegration::instance();
+    self->m_keyboardManager->loadKeymap(QString());
+}
+
+void EpaperIntegration::seabirdCapsLockEnableStatic()
+{
+    EpaperIntegration *self = EpaperIntegration::instance();
+    self->m_keyboardManager->setCapsLockEnabled(true);
+}
+
+void EpaperIntegration::seabirdCapsLockDisableStatic()
+{
+    EpaperIntegration *self = EpaperIntegration::instance();
+    self->m_keyboardManager->setCapsLockEnabled(false);
 }
 
 EpaperIntegration *EpaperIntegration::instance()

@@ -72,6 +72,8 @@ public:
     void addKeyboard(const QString &deviceNode = QString());
     void removeKeyboard(const QString &deviceNode);
 
+    void setCapsLockEnabled(bool enabled);
+
 private:
     void updateDeviceCount();
 

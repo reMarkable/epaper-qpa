@@ -675,4 +675,9 @@ bool EpaperEvdevKeyboardHandler::loadKeymap(const QString &file)
     return true;
 }
 
+void EpaperEvdevKeyboardHandler::setCapsLockEnabled(bool enabled)
+{
+    m_locks[0] = enabled ? 1 : 0;
+}
+
 QT_END_NAMESPACE

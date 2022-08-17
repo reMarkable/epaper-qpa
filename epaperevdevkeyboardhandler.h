@@ -220,6 +220,7 @@ public:
 
     void readKeycode();
     KeycodeAction processKeycode(quint16 keycode, bool pressed, bool autorepeat);
+    void setCapsLockEnabled(bool enabled);
 
 private:
     void processKeyEvent(int nativecode, int unicode, int qtcode,

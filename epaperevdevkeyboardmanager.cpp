@@ -146,6 +146,13 @@ void EpaperEvdevKeyboardManager::updateDeviceCount()
     QInputDeviceManagerPrivate::get(QGuiApplicationPrivate::inputDeviceManager())->setDeviceCount(QInputDeviceManager::DeviceTypeKeyboard, m_keyboards.count());
 }
 
+void EpaperEvdevKeyboardManager::setCapsLockEnabled(bool enabled)
+{
+    for (const auto &keyboard : m_keyboards) {
+        keyboard.handler->setCapsLockEnabled(enabled);
+    }
+}
+
 void EpaperEvdevKeyboardManager::loadKeymap(const QString &file)
 {
     m_defaultKeymapFile = file;
