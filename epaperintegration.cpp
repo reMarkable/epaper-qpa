@@ -33,14 +33,14 @@
 
 #include "epaperintegration.h"
 #include "epaperbackingstore.h"
+#include "epaperevdevkeyboardmanager.h"
 
 #include <QtGui/private/qguiapplication_p.h>
 #include <QtGui/private/qpixmap_raster_p.h>
 #include <qpa/qplatformfontdatabase.h>
-#include <qpa/qplatformwindow.h>
 #include <qpa/qplatforminputcontextfactory_p.h>
+#include <qpa/qplatformwindow.h>
 
-#include <private/qevdevkeyboardmanager_p.h>
 #include <private/qevdevmousemanager_p.h>
 #include <private/qevdevtouchmanager_p.h>
 #include <private/qgenericunixeventdispatcher_p.h>
@@ -49,7 +49,8 @@
 QT_BEGIN_NAMESPACE
 
 EpaperIntegration::EpaperIntegration(const QStringList &parameters) :
-    QObject(),
+    QPlatformIntegration(),
+    QPlatformNativeInterface(),
     m_fontDatabase(0),
     m_inputContext(0)
 {
@@ -86,7 +87,7 @@ bool EpaperIntegration::hasCapability(QPlatformIntegration::Capability cap) cons
 
 void EpaperIntegration::initialize()
 {
-    new QEvdevKeyboardManager(QLatin1String("EvdevKeyboard"), QString(), nullptr);
+    m_keyboardManager = new EpaperEvdevKeyboardManager(QLatin1String("EvdevKeyboard"), QString(), nullptr);
     new QEvdevTouchManager(QLatin1String("EvdevTouch"), QString() /* spec */, nullptr);
 
     m_inputContext = QPlatformInputContextFactory::create();
@@ -120,6 +121,43 @@ QPlatformBackingStore *EpaperIntegration::createPlatformBackingStore(QWindow *wi
 QAbstractEventDispatcher *EpaperIntegration::createEventDispatcher() const
 {
     return createUnixEventDispatcher();
+}
+
+QPlatformNativeInterface *EpaperIntegration::nativeInterface() const
+{
+    return const_cast<EpaperIntegration *>(this);
+}
+
+QFunctionPointer EpaperIntegration::platformFunction(const QByteArray &function) const
+{
+    // Don't change these strings. They must agree with xochitl.
+    if (function == "rm_seabirdConnectionChanged") {
+        return QFunctionPointer(seabirdConnectionChangedStatic);
+    } else if (function == "rm_seabirdCapsLockEnable") {
+        return QFunctionPointer(seabirdCapsLockEnableStatic);
+    } else if (function == "rm_seabirdCapsLockDisable") {
+        return QFunctionPointer(seabirdCapsLockDisableStatic);
+    }
+
+    return nullptr;
+}
+
+void EpaperIntegration::seabirdConnectionChangedStatic()
+{
+    EpaperIntegration *self = EpaperIntegration::instance();
+    self->m_keyboardManager->loadKeymap(QString());
+}
+
+void EpaperIntegration::seabirdCapsLockEnableStatic()
+{
+    EpaperIntegration *self = EpaperIntegration::instance();
+    self->m_keyboardManager->setCapsLockEnabled(true);
+}
+
+void EpaperIntegration::seabirdCapsLockDisableStatic()
+{
+    EpaperIntegration *self = EpaperIntegration::instance();
+    self->m_keyboardManager->setCapsLockEnabled(false);
 }
 
 EpaperIntegration *EpaperIntegration::instance()
