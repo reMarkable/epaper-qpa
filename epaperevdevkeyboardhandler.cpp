@@ -39,6 +39,7 @@
 
 #include "epaperevdevkeyboardhandler.h"
 
+#include <optional>
 #include <qplatformdefs.h>
 
 #include <QCoreApplication>
@@ -71,6 +72,65 @@ QT_BEGIN_NAMESPACE
 Q_LOGGING_CATEGORY(EpaperEvdevKeyboardLog, "rm.epaperkeyboardhandler")
 Q_LOGGING_CATEGORY(EpaperEvdevKeyboardMapLog, "rm.epaperkeyboardhandler.map")
 
+namespace
+{
+    QSettings const qtSettings("remarkable", "xochitl");
+    QString const sysfsLangFile("/sys/pogo/status/lang");
+
+    using EpaperEvdevInputLocale = EpaperEvdevKeyboardHandler::EpaperEvdevInputLocale;
+
+    // Reads the sysfs file for the lang value set by the keyboard firmware.
+    // Only to be used as fallback; QT settings should have precedence over this value.
+    std::optional<EpaperEvdevInputLocale> determineKeymapFirmware()
+    {
+        QFile file(sysfsLangFile);
+        if (!file.open(QIODevice::ReadOnly)) {
+            // No keyboard attached means we fall back to the (unaltered) US keymap.
+            qCWarning(EpaperEvdevKeyboardLog) << "Failed to open pogo lang status: " << file.errorString();
+            return {};
+        }
+
+        QByteArray langCode = file.readAll();
+        qCDebug(EpaperEvdevKeyboardLog) << "Read a langCode of " << langCode;
+        if (langCode.isEmpty()) {
+            // This shouldn't happen, but if it does, try to behave sensibly.
+            return {};
+        }
+
+        // TODO: What other values can be read from the firmware?
+        if (langCode == "NO") {
+            return EpaperEvdevInputLocale::NO_NO;
+        } else if (langCode == "US") {
+            return EpaperEvdevInputLocale::EN_US;
+        }
+
+        return {};
+    }
+
+    // Reads the input locale setting, set from "Type Folio - Keyboard language" in settings menu.
+    std::optional<EpaperEvdevInputLocale> determineKeymapSettings()
+    {
+        QString locale = qtSettings.value("InputLocale").toString();
+
+        // TODO: Locale strings defined both in typefoliolanguagemodel (in xochitl) and here. Could we use a common header?
+        if (locale == "no_DK") {
+            return EpaperEvdevInputLocale::NO_DK;
+        } else if (locale == "no_NO") {
+            return EpaperEvdevInputLocale::NO_NO;
+        } else if (locale == "no_SV") {
+            return EpaperEvdevInputLocale::NO_SV;
+        } else if (locale == "en_UK") {
+            return EpaperEvdevInputLocale::EN_UK;
+        } else if (locale == "en_US") {
+            return EpaperEvdevInputLocale::EN_US;
+        } else if (locale == "es_ES") {
+            return EpaperEvdevInputLocale::ES_ES;
+        }
+
+        return {};
+    }
+}
+
 void EpaperEvdevFdContainer::reset() noexcept
 {
     if (m_fd >= 0)
@@ -85,6 +145,11 @@ EpaperEvdevKeyboardHandler::EpaperEvdevKeyboardHandler(const QString &device, Ep
     m_keymap(0), m_keymap_size(0), m_keycompose(0), m_keycompose_size(0)
 {
     qCDebug(EpaperEvdevKeyboardLog) << "Create keyboard handler with for device" << device;
+
+    // Watch the xochitl configuration file for changes in locale settings.
+    m_watcher.addPath(qtSettings.fileName());
+    this->onSettingsChanged();
+    connect(&m_watcher, &QFileSystemWatcher::fileChanged, this, &EpaperEvdevKeyboardHandler::onSettingsChanged);
 
     setObjectName(QLatin1String("LinuxInput Keyboard Handler"));
 
@@ -483,56 +548,14 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
 #include "map/epaperevdevkeyboardmap_no.h"
 #include "map/epaperevdevkeyboardmap_us.h"
 #include "map/epaperevdevkeyboardmap_us_rm.h"
-
-enum class EpaperEvdevBuiltinKeymap {
-    US,
-    US_RM,
-    NO,
-};
-
-static EpaperEvdevBuiltinKeymap determineKeymap()
-{
-    QFile file("/sys/pogo/status/lang");
-    if (!file.open(QIODevice::ReadOnly)) {
-        // No keyboard attached means we fall back to the (unaltered) US keymap.
-        qCWarning(EpaperEvdevKeyboardLog) << "failed to open pogo lang status" << file.errorString();
-        return EpaperEvdevBuiltinKeymap::US;
-    }
-
-    QByteArray langCode = file.readAll();
-    qCDebug(EpaperEvdevKeyboardLog) << "read a langCode of " << langCode;
-    if (langCode.isEmpty()) {
-        // This shouldn't happen, but if it does, try to behave sensibly.
-        qCWarning(EpaperEvdevKeyboardLog) << "langCode was empty, assuming US layout";
-        return EpaperEvdevBuiltinKeymap::US;
-    }
-
-    if (langCode == "NO") {
-        // In the case of a nordic keyboard, we need to know which layout to make use of.
-        // This is controlled by a setting, set app-side, as there are multiple variants
-        // of layout all with one physical layout.
-        // FIXME: Should use a QFileSystemWatcher on setings file to re-trigger keymap unload.
-        QSettings settings;
-        QString locale = settings.value("InputLocale").toString();
-        qCWarning(EpaperEvdevKeyboardLog) << "detected a nordic langCode with a locale of " << locale << " set app-side";
-
-        // FIXME: For now, we just always assume nordic keymapping in this case.
-        // When we have more mappings in place, and a more fixed idea of what
-        // the setting should be, let's check it properly.
-        return EpaperEvdevBuiltinKeymap::NO;
-    } else if (langCode == "EN") {
-        return EpaperEvdevBuiltinKeymap::US_RM;
-    }
-
-    // FIXME: I expect other lang codes need handling, but they don't yet have layouts defined by us.
-    // The kernel defines at least "FR" at present, see dev_language in pogo_sysfs.c.
-    qCWarning(EpaperEvdevKeyboardLog) << "detected an unexpected langCode " << langCode << " - assuming US layout";
-    return EpaperEvdevBuiltinKeymap::US_RM;
-}
+#include "map/epaperevdevkeyboardmap_es.h"
 
 void EpaperEvdevKeyboardHandler::unloadKeymap()
 {
     qCDebug(EpaperEvdevKeyboardLog, "Unload current keymap and restore built-in");
+
+    QSettings settings;
+    QString locale = settings.value("InputLocale").toString();
 
     if (m_didLoadKeymap) {
         delete[] m_keymap;
@@ -544,27 +567,70 @@ void EpaperEvdevKeyboardHandler::unloadKeymap()
     const EpaperEvdevKeyboardMap::Composing *keycomposeFirst = nullptr;
     int keycomposeSize = 0;
 
-    switch (determineKeymap()) {
-    case EpaperEvdevBuiltinKeymap::US:
-        keymapFirst = s_keymap_us;
-        keymapSize = sizeof(s_keymap_us) / sizeof(s_keymap_us[0]);
-        keycomposeFirst = s_keycompose_us;
-        keycomposeSize = sizeof(s_keycompose_us) / sizeof(s_keycompose_us[0]);
-        qCDebug(EpaperEvdevKeyboardLog) << "setting US keymap" << keymapSize << keycomposeSize;
+    // Check if input locale is set in xochitl.conf (set from type folio settings in the GUI).
+    // If not, fetch the layout from the firmware and make assumptions (e.g. that nordic keyboard is Norwegian and not Swedish).
+    auto keymap = EpaperEvdevInputLocale::EN_US;
+    if (auto keymapOpt = determineKeymapSettings(); keymapOpt)
+    {
+        qCDebug(EpaperEvdevKeyboardLog) << "Keymap has been determined by the QT settings.";
+        keymap = keymapOpt.value();
+    }
+    else if (auto keymapOpt = determineKeymapFirmware(); keymapOpt)
+    {
+        qCDebug(EpaperEvdevKeyboardLog) << "Keymap has been determined by the firmware settings.";
+        keymap = keymapOpt.value();
+    }
+    else
+    {
+        qCWarning(EpaperEvdevKeyboardLog) << "No keymap set by QT settings or firmware, defaulting to US.";
+    }
+    m_prevLocale = keymap;
+
+    switch (keymap) {
+    case EpaperEvdevInputLocale::NO_DK:
+        // TODO: Change when Danish is implemented.
+        keymapFirst = s_keymap_no;
+        keymapSize = sizeof(s_keymap_no) / sizeof(s_keymap_no[0]);
+        keycomposeFirst = s_keycompose_no;
+        keycomposeSize = sizeof(s_keycompose_no) / sizeof(s_keycompose_no[0]);
+        qCDebug(EpaperEvdevKeyboardLog) << "setting DK keymap" << keymapSize << keycomposeSize;
         break;
-    case EpaperEvdevBuiltinKeymap::US_RM:
+    case EpaperEvdevInputLocale::NO_NO:
+        keymapFirst = s_keymap_no;
+        keymapSize = sizeof(s_keymap_no) / sizeof(s_keymap_no[0]);
+        keycomposeFirst = s_keycompose_no;
+        keycomposeSize = sizeof(s_keycompose_no) / sizeof(s_keycompose_no[0]);
+        qCDebug(EpaperEvdevKeyboardLog) << "setting NO keymap" << keymapSize << keycomposeSize;
+        break;
+    case EpaperEvdevInputLocale::NO_SV:
+        // TODO: Change when Swedish is implemented.
+        keymapFirst = s_keymap_no;
+        keymapSize = sizeof(s_keymap_no) / sizeof(s_keymap_no[0]);
+        keycomposeFirst = s_keycompose_no;
+        keycomposeSize = sizeof(s_keycompose_no) / sizeof(s_keycompose_no[0]);
+        qCDebug(EpaperEvdevKeyboardLog) << "setting SV keymap" << keymapSize << keycomposeSize;
+        break;
+    case EpaperEvdevInputLocale::EN_UK:
+        // TODO: We currently have UK and no US in settings. Will use the US mapping for now until we differentiate.
+        keymapFirst = s_keymap_us_rm;
+        keymapSize = sizeof(s_keymap_us_rm) / sizeof(s_keymap_us_rm[0]);
+        keycomposeFirst = s_keycompose_us_rm;
+        keycomposeSize = sizeof(s_keycompose_us_rm) / sizeof(s_keycompose_us_rm[0]);
+        qCDebug(EpaperEvdevKeyboardLog) << "setting UK keymap" << keymapSize << keycomposeSize;
+        break;
+    case EpaperEvdevInputLocale::EN_US:
         keymapFirst = s_keymap_us_rm;
         keymapSize = sizeof(s_keymap_us_rm) / sizeof(s_keymap_us_rm[0]);
         keycomposeFirst = s_keycompose_us_rm;
         keycomposeSize = sizeof(s_keycompose_us_rm) / sizeof(s_keycompose_us_rm[0]);
         qCDebug(EpaperEvdevKeyboardLog) << "setting US (RM) keymap" << keymapSize << keycomposeSize;
         break;
-    case EpaperEvdevBuiltinKeymap::NO:
-        keymapFirst = s_keymap_no;
-        keymapSize = sizeof(s_keymap_no) / sizeof(s_keymap_no[0]);
-        keycomposeFirst = s_keycompose_no;
-        keycomposeSize = sizeof(s_keycompose_no) / sizeof(s_keycompose_no[0]);
-        qCDebug(EpaperEvdevKeyboardLog) << "setting NO keymap" << keymapSize << keycomposeSize;
+    case EpaperEvdevInputLocale::ES_ES:
+        keymapFirst = s_keymap_es;
+        keymapSize = sizeof(s_keymap_es) / sizeof(s_keymap_es[0]);
+        keycomposeFirst = s_keycompose_es;
+        keycomposeSize = sizeof(s_keycompose_es) / sizeof(s_keycompose_es[0]);
+        qCDebug(EpaperEvdevKeyboardLog) << "setting ES keymap" << keymapSize << keycomposeSize;
         break;
     default:
         qCWarning(EpaperEvdevKeyboardLog) << "setting *no* keymap! uh oh!";
@@ -618,6 +684,9 @@ void EpaperEvdevKeyboardHandler::unloadKeymap()
 bool EpaperEvdevKeyboardHandler::loadKeymap(const QString &file)
 {
     qCDebug(EpaperEvdevKeyboardLog, "Loading keymap %ls", qUtf16Printable(file));
+    
+    QSettings settings;
+    QString locale = settings.value("InputLocale").toString();
 
     QFile f(file);
 
@@ -680,4 +749,18 @@ void EpaperEvdevKeyboardHandler::setCapsLockEnabled(bool enabled)
     m_locks[0] = enabled ? 1 : 0;
 }
 
+void EpaperEvdevKeyboardHandler::onSettingsChanged()
+{
+    // Need to remove and readd file on watchlist for some reason...
+    m_watcher.removePath(qtSettings.fileName());
+    m_watcher.addPath(qtSettings.fileName());
+
+    // Skip if config change is irrelevant to us.
+    if (auto const newLocale = determineKeymapSettings(); newLocale != m_prevLocale)
+    {
+        qCDebug(EpaperEvdevKeyboardLog) << "Input locale setting has changed, updating the key map.";
+        unloadKeymap();
+        // `m_prevLocale = newLocale` done inside unloadKeymap()
+    }
+}
 QT_END_NAMESPACE

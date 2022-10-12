@@ -51,6 +51,7 @@
 //
 
 #include <QDataStream>
+#include <QFileSystemWatcher> 
 #include <QTimer>
 #include <qobject.h>
 
@@ -177,6 +178,15 @@ public:
     EpaperEvdevKeyboardHandler(const QString &device, EpaperEvdevFdContainer &fd, bool disableZap, bool enableCompose, const QString &keymapFile);
     ~EpaperEvdevKeyboardHandler();
 
+    enum class EpaperEvdevInputLocale {
+        NO_DK,
+        NO_NO,
+        NO_SV,
+        EN_UK,
+        EN_US,
+        ES_ES,
+    };
+
     enum KeycodeAction {
         None = 0,
 
@@ -245,6 +255,12 @@ private:
     int m_keymap_size;
     const EpaperEvdevKeyboardMap::Composing *m_keycompose;
     int m_keycompose_size;
+    QFileSystemWatcher m_watcher;
+    QString m_firmwareLang;
+    EpaperEvdevInputLocale m_prevLocale;
+
+private slots:
+    void onSettingsChanged();
 };
 
 QT_END_NAMESPACE
