@@ -19,7 +19,8 @@ HEADERS += \
     map/epaperevdevkeyboardmap_no.h \
     map/epaperevdevkeyboardmap_us.h \
     map/epaperevdevkeyboardmap_us_rm.h \
-    map/epaperevdevkeyboardmap_es.h
+    map/epaperevdevkeyboardmap_es.h \
+    map/epaperevdevkeyboardmap_fr.h
 
 OTHER_FILES += minimal.json
 

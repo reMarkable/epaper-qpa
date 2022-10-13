@@ -125,6 +125,8 @@ namespace
             return EpaperEvdevInputLocale::EN_US;
         } else if (locale == "es_ES") {
             return EpaperEvdevInputLocale::ES_ES;
+        } else if (locale == "fr_FR") {
+            return EpaperEvdevInputLocale::FR_FR;
         }
 
         return {};
@@ -549,6 +551,7 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
 #include "map/epaperevdevkeyboardmap_us.h"
 #include "map/epaperevdevkeyboardmap_us_rm.h"
 #include "map/epaperevdevkeyboardmap_es.h"
+#include "map/epaperevdevkeyboardmap_fr.h"
 
 void EpaperEvdevKeyboardHandler::unloadKeymap()
 {
@@ -570,12 +573,12 @@ void EpaperEvdevKeyboardHandler::unloadKeymap()
     // Check if input locale is set in xochitl.conf (set from type folio settings in the GUI).
     // If not, fetch the layout from the firmware and make assumptions (e.g. that nordic keyboard is Norwegian and not Swedish).
     auto keymap = EpaperEvdevInputLocale::EN_US;
-    if (auto keymapOpt = determineKeymapSettings(); keymapOpt)
+    if (auto const keymapOpt = determineKeymapSettings())
     {
         qCDebug(EpaperEvdevKeyboardLog) << "Keymap has been determined by the QT settings.";
         keymap = keymapOpt.value();
     }
-    else if (auto keymapOpt = determineKeymapFirmware(); keymapOpt)
+    else if (auto const keymapOpt = determineKeymapFirmware())
     {
         qCDebug(EpaperEvdevKeyboardLog) << "Keymap has been determined by the firmware settings.";
         keymap = keymapOpt.value();
@@ -632,6 +635,13 @@ void EpaperEvdevKeyboardHandler::unloadKeymap()
         keycomposeSize = sizeof(s_keycompose_es) / sizeof(s_keycompose_es[0]);
         qCDebug(EpaperEvdevKeyboardLog) << "setting ES keymap" << keymapSize << keycomposeSize;
         break;
+    case EpaperEvdevInputLocale::FR_FR:
+        keymapFirst = s_keymap_fr;
+        keymapSize = sizeof(s_keymap_fr) / sizeof(s_keymap_fr[0]);
+        keycomposeFirst = s_keycompose_fr;
+        keycomposeSize = sizeof(s_keycompose_fr) / sizeof(s_keycompose_fr[0]);
+        qCDebug(EpaperEvdevKeyboardLog) << "setting FR keymap" << keymapSize << keycomposeSize;
+        break;
     default:
         qCWarning(EpaperEvdevKeyboardLog) << "setting *no* keymap! uh oh!";
     }
@@ -685,9 +695,6 @@ bool EpaperEvdevKeyboardHandler::loadKeymap(const QString &file)
 {
     qCDebug(EpaperEvdevKeyboardLog, "Loading keymap %ls", qUtf16Printable(file));
     
-    QSettings settings;
-    QString locale = settings.value("InputLocale").toString();
-
     QFile f(file);
 
     if (!f.open(QIODevice::ReadOnly)) {
