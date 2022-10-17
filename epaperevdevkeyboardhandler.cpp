@@ -552,6 +552,7 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
 #include "map/epaperevdevkeyboardmap_us_rm.h"
 #include "map/epaperevdevkeyboardmap_es.h"
 #include "map/epaperevdevkeyboardmap_fr.h"
+#include "map/epaperevdevkeyboardmap_uk.h"
 
 void EpaperEvdevKeyboardHandler::unloadKeymap()
 {
@@ -614,11 +615,10 @@ void EpaperEvdevKeyboardHandler::unloadKeymap()
         qCDebug(EpaperEvdevKeyboardLog) << "setting SV keymap" << keymapSize << keycomposeSize;
         break;
     case EpaperEvdevInputLocale::EN_UK:
-        // TODO: We currently have UK and no US in settings. Will use the US mapping for now until we differentiate.
-        keymapFirst = s_keymap_us_rm;
-        keymapSize = sizeof(s_keymap_us_rm) / sizeof(s_keymap_us_rm[0]);
-        keycomposeFirst = s_keycompose_us_rm;
-        keycomposeSize = sizeof(s_keycompose_us_rm) / sizeof(s_keycompose_us_rm[0]);
+        keymapFirst = s_keymap_uk;
+        keymapSize = sizeof(s_keymap_uk) / sizeof(s_keymap_uk[0]);
+        keycomposeFirst = s_keycompose_uk;
+        keycomposeSize = sizeof(s_keycompose_uk) / sizeof(s_keycompose_uk[0]);
         qCDebug(EpaperEvdevKeyboardLog) << "setting UK keymap" << keymapSize << keycomposeSize;
         break;
     case EpaperEvdevInputLocale::EN_US:
