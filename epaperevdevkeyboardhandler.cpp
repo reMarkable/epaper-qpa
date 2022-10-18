@@ -127,6 +127,8 @@ namespace
             return EpaperEvdevInputLocale::ES_ES;
         } else if (locale == "fr_FR") {
             return EpaperEvdevInputLocale::FR_FR;
+        } else if (locale == "de_DE") {
+            return EpaperEvdevInputLocale::DE_DE;
         }
 
         return {};
@@ -553,6 +555,7 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
 #include "map/epaperevdevkeyboardmap_es.h"
 #include "map/epaperevdevkeyboardmap_fr.h"
 #include "map/epaperevdevkeyboardmap_uk.h"
+#include "map/epaperevdevkeyboardmap_de.h"
 
 void EpaperEvdevKeyboardHandler::unloadKeymap()
 {
@@ -641,6 +644,13 @@ void EpaperEvdevKeyboardHandler::unloadKeymap()
         keycomposeFirst = s_keycompose_fr;
         keycomposeSize = sizeof(s_keycompose_fr) / sizeof(s_keycompose_fr[0]);
         qCDebug(EpaperEvdevKeyboardLog) << "setting FR keymap" << keymapSize << keycomposeSize;
+        break;
+    case EpaperEvdevInputLocale::DE_DE:
+        keymapFirst = s_keymap_de;
+        keymapSize = sizeof(s_keymap_de) / sizeof(s_keymap_de[0]);
+        keycomposeFirst = s_keycompose_de;
+        keycomposeSize = sizeof(s_keycompose_de) / sizeof(s_keycompose_de[0]);
+        qCDebug(EpaperEvdevKeyboardLog) << "setting DE keymap" << keymapSize << keycomposeSize;
         break;
     default:
         qCWarning(EpaperEvdevKeyboardLog) << "setting *no* keymap! uh oh!";
