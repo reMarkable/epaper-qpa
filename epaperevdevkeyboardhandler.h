@@ -185,7 +185,8 @@ public:
         EN_UK,
         EN_US,
         ES_ES,
-        FR_FR
+        FR_FR,
+        DE_DE
     };
 
     enum KeycodeAction {
