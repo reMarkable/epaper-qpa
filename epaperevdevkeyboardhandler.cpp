@@ -98,10 +98,14 @@ namespace
         }
 
         // TODO: What other values can be read from the firmware?
-        if (langCode == "NO") {
-            return EpaperEvdevInputLocale::NO_NO;
+        if (langCode == "ES") {
+            return EpaperEvdevInputLocale::Spain;
+        } else if (langCode == "NO") {
+            return EpaperEvdevInputLocale::Norway;
+        } else if (langCode == "UK") {
+            return EpaperEvdevInputLocale::UnitedKingdom;
         } else if (langCode == "US") {
-            return EpaperEvdevInputLocale::EN_US;
+            return EpaperEvdevInputLocale::UnitedStates;
         }
 
         return {};
@@ -112,23 +116,24 @@ namespace
     {
         QString locale = qtSettings.value("InputLocale").toString();
 
-        // TODO: Locale strings defined both in typefoliolanguagemodel (in xochitl) and here. Could we use a common header?
         if (locale == "no_DK") {
-            return EpaperEvdevInputLocale::NO_DK;
+            return EpaperEvdevInputLocale::Denmark;
         } else if (locale == "no_NO") {
-            return EpaperEvdevInputLocale::NO_NO;
+            return EpaperEvdevInputLocale::Norway;
         } else if (locale == "no_SV") {
-            return EpaperEvdevInputLocale::NO_SV;
+            return EpaperEvdevInputLocale::Sweden;
+        } else if (locale == "fi_FI") {
+            return EpaperEvdevInputLocale::Finland;
         } else if (locale == "en_UK") {
-            return EpaperEvdevInputLocale::EN_UK;
+            return EpaperEvdevInputLocale::UnitedKingdom;
         } else if (locale == "en_US") {
-            return EpaperEvdevInputLocale::EN_US;
+            return EpaperEvdevInputLocale::UnitedStates;
         } else if (locale == "es_ES") {
-            return EpaperEvdevInputLocale::ES_ES;
+            return EpaperEvdevInputLocale::Spain;
         } else if (locale == "fr_FR") {
-            return EpaperEvdevInputLocale::FR_FR;
+            return EpaperEvdevInputLocale::France;
         } else if (locale == "de_DE") {
-            return EpaperEvdevInputLocale::DE_DE;
+            return EpaperEvdevInputLocale::Germany;
         }
 
         return {};
@@ -556,6 +561,7 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
 #include "map/epaperevdevkeyboardmap_fr.h"
 #include "map/epaperevdevkeyboardmap_uk.h"
 #include "map/epaperevdevkeyboardmap_de.h"
+#include "map/epaperevdevkeyboardmap_se.h"
 
 void EpaperEvdevKeyboardHandler::unloadKeymap()
 {
@@ -576,7 +582,7 @@ void EpaperEvdevKeyboardHandler::unloadKeymap()
 
     // Check if input locale is set in xochitl.conf (set from type folio settings in the GUI).
     // If not, fetch the layout from the firmware and make assumptions (e.g. that nordic keyboard is Norwegian and not Swedish).
-    auto keymap = EpaperEvdevInputLocale::EN_US;
+    auto keymap = EpaperEvdevInputLocale::UnitedStates;
     if (auto const keymapOpt = determineKeymapSettings())
     {
         qCDebug(EpaperEvdevKeyboardLog) << "Keymap has been determined by the QT settings.";
@@ -594,63 +600,64 @@ void EpaperEvdevKeyboardHandler::unloadKeymap()
     m_prevLocale = keymap;
 
     switch (keymap) {
-    case EpaperEvdevInputLocale::NO_DK:
+    case EpaperEvdevInputLocale::Denmark:
         // TODO: Change when Danish is implemented.
         keymapFirst = s_keymap_no;
         keymapSize = sizeof(s_keymap_no) / sizeof(s_keymap_no[0]);
         keycomposeFirst = s_keycompose_no;
         keycomposeSize = sizeof(s_keycompose_no) / sizeof(s_keycompose_no[0]);
-        qCDebug(EpaperEvdevKeyboardLog) << "setting DK keymap" << keymapSize << keycomposeSize;
+        qCDebug(EpaperEvdevKeyboardLog) << "setting Danish keymap" << keymapSize << keycomposeSize;
         break;
-    case EpaperEvdevInputLocale::NO_NO:
+    case EpaperEvdevInputLocale::Norway:
         keymapFirst = s_keymap_no;
         keymapSize = sizeof(s_keymap_no) / sizeof(s_keymap_no[0]);
         keycomposeFirst = s_keycompose_no;
         keycomposeSize = sizeof(s_keycompose_no) / sizeof(s_keycompose_no[0]);
-        qCDebug(EpaperEvdevKeyboardLog) << "setting NO keymap" << keymapSize << keycomposeSize;
+        qCDebug(EpaperEvdevKeyboardLog) << "setting Norwegian keymap" << keymapSize << keycomposeSize;
         break;
-    case EpaperEvdevInputLocale::NO_SV:
-        // TODO: Change when Swedish is implemented.
-        keymapFirst = s_keymap_no;
-        keymapSize = sizeof(s_keymap_no) / sizeof(s_keymap_no[0]);
-        keycomposeFirst = s_keycompose_no;
-        keycomposeSize = sizeof(s_keycompose_no) / sizeof(s_keycompose_no[0]);
-        qCDebug(EpaperEvdevKeyboardLog) << "setting SV keymap" << keymapSize << keycomposeSize;
+    case EpaperEvdevInputLocale::Finland:
+    case EpaperEvdevInputLocale::Sweden:
+        // Finnish and Swedish layouts are the same.
+        keymapFirst = s_keymap_se;
+        keymapSize = sizeof(s_keymap_se) / sizeof(s_keymap_se[0]);
+        keycomposeFirst = s_keycompose_se;
+        keycomposeSize = sizeof(s_keycompose_se) / sizeof(s_keycompose_se[0]);
+        qCDebug(EpaperEvdevKeyboardLog) << "setting Swedish keymap" << keymapSize << keycomposeSize;
         break;
-    case EpaperEvdevInputLocale::EN_UK:
+    case EpaperEvdevInputLocale::UnitedKingdom:
         keymapFirst = s_keymap_uk;
         keymapSize = sizeof(s_keymap_uk) / sizeof(s_keymap_uk[0]);
         keycomposeFirst = s_keycompose_uk;
         keycomposeSize = sizeof(s_keycompose_uk) / sizeof(s_keycompose_uk[0]);
         qCDebug(EpaperEvdevKeyboardLog) << "setting UK keymap" << keymapSize << keycomposeSize;
         break;
-    case EpaperEvdevInputLocale::EN_US:
+    case EpaperEvdevInputLocale::UnitedStates:
         keymapFirst = s_keymap_us_rm;
         keymapSize = sizeof(s_keymap_us_rm) / sizeof(s_keymap_us_rm[0]);
         keycomposeFirst = s_keycompose_us_rm;
         keycomposeSize = sizeof(s_keycompose_us_rm) / sizeof(s_keycompose_us_rm[0]);
-        qCDebug(EpaperEvdevKeyboardLog) << "setting US (RM) keymap" << keymapSize << keycomposeSize;
+        qCDebug(EpaperEvdevKeyboardLog) << "setting US keymap" << keymapSize << keycomposeSize;
         break;
-    case EpaperEvdevInputLocale::ES_ES:
+    case EpaperEvdevInputLocale::Spain:
         keymapFirst = s_keymap_es;
         keymapSize = sizeof(s_keymap_es) / sizeof(s_keymap_es[0]);
         keycomposeFirst = s_keycompose_es;
         keycomposeSize = sizeof(s_keycompose_es) / sizeof(s_keycompose_es[0]);
-        qCDebug(EpaperEvdevKeyboardLog) << "setting ES keymap" << keymapSize << keycomposeSize;
+        qCDebug(EpaperEvdevKeyboardLog) << "setting Spanish keymap" << keymapSize << keycomposeSize;
         break;
-    case EpaperEvdevInputLocale::FR_FR:
+    case EpaperEvdevInputLocale::France:
         keymapFirst = s_keymap_fr;
         keymapSize = sizeof(s_keymap_fr) / sizeof(s_keymap_fr[0]);
         keycomposeFirst = s_keycompose_fr;
         keycomposeSize = sizeof(s_keycompose_fr) / sizeof(s_keycompose_fr[0]);
-        qCDebug(EpaperEvdevKeyboardLog) << "setting FR keymap" << keymapSize << keycomposeSize;
+        qCDebug(EpaperEvdevKeyboardLog) << "setting French keymap" << keymapSize << keycomposeSize;
         break;
-    case EpaperEvdevInputLocale::DE_DE:
+    case EpaperEvdevInputLocale::Germany:
         keymapFirst = s_keymap_de;
         keymapSize = sizeof(s_keymap_de) / sizeof(s_keymap_de[0]);
         keycomposeFirst = s_keycompose_de;
         keycomposeSize = sizeof(s_keycompose_de) / sizeof(s_keycompose_de[0]);
-        qCDebug(EpaperEvdevKeyboardLog) << "setting DE keymap" << keymapSize << keycomposeSize;
+        qCDebug(EpaperEvdevKeyboardLog) << "setting German keymap" << keymapSize << keycomposeSize;
         break;
     default:
         qCWarning(EpaperEvdevKeyboardLog) << "setting *no* keymap! uh oh!";
