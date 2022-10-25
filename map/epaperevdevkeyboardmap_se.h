@@ -61,6 +61,9 @@ using namespace EpaperEvdevKeyboardMap;
 
 // no QT_BEGIN_NAMESPACE, since we include it internally...
 
+// Reference for Unicode names and values: https://unicode-table.com/en/
+// Reference for QT key enums: https://doc.qt.io/qt-5/qt.html#Key-enum
+
 const EpaperEvdevKeyboardMap::Mapping s_keymap_se[] = {
     { 1, 0xffff, 0x01000000, 0x00, 0x00, 0x0000 },
 

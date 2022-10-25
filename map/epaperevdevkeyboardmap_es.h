@@ -61,6 +61,9 @@ using namespace EpaperEvdevKeyboardMap;
 
 // no QT_BEGIN_NAMESPACE, since we include it internally...
 
+// Reference for Unicode names and values: https://unicode-table.com/en/
+// Reference for QT key enums: https://doc.qt.io/qt-5/qt.html#Key-enum
+
 const EpaperEvdevKeyboardMap::Mapping s_keymap_es[] = {
     { 1, 0xffff, 0x01000000, 0x00, 0x00, 0x0000 },
 
@@ -543,7 +546,7 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_es[] = {
 
     // KEY_APOSTROPHE (40)
     // "'" Combining Acute Accent 0x0301
-    // """ Combining Diaeresis 0x0308
+    // "¨" Combining Diaeresis 0x0308
     // "ç" Latin Small Letter C with Cedilla 0x00e7
     // "Ç" Latin Capital Letter C with Cedilla 0x00c7
     { KEY_APOSTROPHE, 0x0301, Qt::Key_Dead_Acute, Modifiers::ModPlain, Flags::IsDead, 0x0000 },
