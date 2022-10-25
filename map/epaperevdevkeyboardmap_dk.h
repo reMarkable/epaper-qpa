@@ -64,7 +64,7 @@ using namespace EpaperEvdevKeyboardMap;
 // Reference for Unicode names and values: https://unicode-table.com/en/
 // Reference for QT key enums: https://doc.qt.io/qt-5/qt.html#Key-enum
 
-const EpaperEvdevKeyboardMap::Mapping s_keymap_no[] = {
+const EpaperEvdevKeyboardMap::Mapping s_keymap_dk[] = {
     { 1, 0xffff, 0x01000000, 0x00, 0x00, 0x0000 },
 
     // KEY_1 (2)
@@ -518,32 +518,32 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_no[] = {
     { KEY_L, 0x004c, 0x0c00004c, 0x0f, 0x02, 0x0000 },
 
     // KEY_SEMICOLON (39)
-    // "ø" Latin Small Letter O with Stroke 0x00f8
-    // "Ø" Latin Capital Letter O with Stroke 0x00d8
-    { KEY_SEMICOLON, 0x00f8, Qt::Key_Ooblique, 0x00, 0x02, 0x0000 },
-    { KEY_SEMICOLON, 0x00d8, Qt::Key_Ooblique, 0x01, 0x02, 0x0000 },
-    { KEY_SEMICOLON, 0x00f8, Qt::Key_Ooblique, 0x02, 0x02, 0x0000 },
-    { KEY_SEMICOLON, 0x00d8, Qt::Key_Ooblique, 0x03, 0x02, 0x0000 },
-    { KEY_SEMICOLON, 0x00f8, Qt::Key_Ooblique, 0x04, 0x02, 0x0000 },
-    { KEY_SEMICOLON, 0x00d8, Qt::Key_Ooblique, 0x05, 0x02, 0x0000 },
-    { KEY_SEMICOLON, 0x00f8, Qt::Key_Ooblique, 0x06, 0x02, 0x0000 },
-    { KEY_SEMICOLON, 0x00d8, Qt::Key_Ooblique, 0x07, 0x02, 0x0000 },
-    { KEY_SEMICOLON, 0x00f8, Qt::Key_Ooblique, 0x08, 0x02, 0x0000 },
-    { KEY_SEMICOLON, 0x00d8, Qt::Key_Ooblique, 0x09, 0x02, 0x0000 },
-    { KEY_SEMICOLON, 0x00f8, Qt::Key_Ooblique, 0x0a, 0x02, 0x0000 },
-    { KEY_SEMICOLON, 0x00d8, Qt::Key_Ooblique, 0x0b, 0x02, 0x0000 },
-    { KEY_SEMICOLON, 0x00f8, Qt::Key_Ooblique, 0x0c, 0x02, 0x0000 },
-    { KEY_SEMICOLON, 0x00d8, Qt::Key_Ooblique, 0x0d, 0x02, 0x0000 },
-    { KEY_SEMICOLON, 0x00f8, Qt::Key_Ooblique, 0x0e, 0x02, 0x0000 },
-    { KEY_SEMICOLON, 0x00d8, Qt::Key_Ooblique, 0x0f, 0x02, 0x0000 },
-
-    // KEY_APOSTROPHE (40)
     // "æ" Latin Small Letter Ae 0x00e6
     // "Æ" Latin Capital Letter Ae 0x00c6
+    { KEY_SEMICOLON, 0x00e6, Qt::Key_AE, 0x00, 0x02, 0x0000 },
+    { KEY_SEMICOLON, 0x00c6, Qt::Key_AE, 0x01, 0x02, 0x0000 },
+    { KEY_SEMICOLON, 0x00e6, Qt::Key_AE, 0x02, 0x02, 0x0000 },
+    { KEY_SEMICOLON, 0x00c6, Qt::Key_AE, 0x03, 0x02, 0x0000 },
+    { KEY_SEMICOLON, 0x00e6, Qt::Key_AE, 0x04, 0x02, 0x0000 },
+    { KEY_SEMICOLON, 0x00c6, Qt::Key_AE, 0x05, 0x02, 0x0000 },
+    { KEY_SEMICOLON, 0x00e6, Qt::Key_AE, 0x06, 0x02, 0x0000 },
+    { KEY_SEMICOLON, 0x00c6, Qt::Key_AE, 0x07, 0x02, 0x0000 },
+    { KEY_SEMICOLON, 0x00e6, Qt::Key_AE, 0x08, 0x02, 0x0000 },
+    { KEY_SEMICOLON, 0x00c6, Qt::Key_AE, 0x09, 0x02, 0x0000 },
+    { KEY_SEMICOLON, 0x00e6, Qt::Key_AE, 0x0a, 0x02, 0x0000 },
+    { KEY_SEMICOLON, 0x00c6, Qt::Key_AE, 0x0b, 0x02, 0x0000 },
+    { KEY_SEMICOLON, 0x00e6, Qt::Key_AE, 0x0c, 0x02, 0x0000 },
+    { KEY_SEMICOLON, 0x00c6, Qt::Key_AE, 0x0d, 0x02, 0x0000 },
+    { KEY_SEMICOLON, 0x00e6, Qt::Key_AE, 0x0e, 0x02, 0x0000 },
+    { KEY_SEMICOLON, 0x00c6, Qt::Key_AE, 0x0f, 0x02, 0x0000 },
+
+    // KEY_APOSTROPHE (40)
+    // "ø" Latin Small Letter O with Stroke 0x00f8
+    // "Ø" Latin Capital Letter O with Stroke 0x00d8
     // "'" Apostrophe 0x0027
     // "*" Asterisk 0x002a
-    { KEY_APOSTROPHE, 0x00e6, Qt::Key_AE, 0x00, 0x02, 0x0000 },
-    { KEY_APOSTROPHE, 0x00c6, Qt::Key_AE, Modifiers::ModShift, 0x02, 0x0000 },
+    { KEY_APOSTROPHE, 0x00f8, Qt::Key_Ooblique, 0x00, 0x02, 0x0000 },
+    { KEY_APOSTROPHE, 0x00d8, Qt::Key_Ooblique, Modifiers::ModShift, 0x02, 0x0000 },
     { KEY_APOSTROPHE, 0x0027, Qt::Key_Apostrophe, Modifiers::ModAlt, 0x00, 0x0000 },
     { KEY_APOSTROPHE, 0x0027, Qt::Key_Apostrophe, Modifiers::ModAltGr, 0x00, 0x0000 },
     { KEY_APOSTROPHE, 0x002a, Qt::Key_Asterisk, Modifiers::ModShift | Modifiers::ModAlt, 0x00, 0x0000 },
@@ -878,7 +878,7 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_no[] = {
     { KEY_CHANNELDOWN, 0xffff, Qt::Key_ChannelDown, 0x00, 0x00, 0x0000 },
 };
 
-const EpaperEvdevKeyboardMap::Composing s_keycompose_no[] = {
+const EpaperEvdevKeyboardMap::Composing s_keycompose_dk[] = {
     { 0x0060, 0x0041, 0x00c0 },
     { 0x0060, 0x0061, 0x00e0 },
     { 0x0027, 0x0041, 0x00c1 },
