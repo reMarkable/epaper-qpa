@@ -561,6 +561,7 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
 #include "map/epaperevdevkeyboardmap_fr.h"
 #include "map/epaperevdevkeyboardmap_uk.h"
 #include "map/epaperevdevkeyboardmap_de.h"
+#include "map/epaperevdevkeyboardmap_dk.h"
 #include "map/epaperevdevkeyboardmap_se.h"
 
 void EpaperEvdevKeyboardHandler::unloadKeymap()
@@ -601,11 +602,10 @@ void EpaperEvdevKeyboardHandler::unloadKeymap()
 
     switch (keymap) {
     case EpaperEvdevInputLocale::Denmark:
-        // TODO: Change when Danish is implemented.
-        keymapFirst = s_keymap_no;
-        keymapSize = sizeof(s_keymap_no) / sizeof(s_keymap_no[0]);
-        keycomposeFirst = s_keycompose_no;
-        keycomposeSize = sizeof(s_keycompose_no) / sizeof(s_keycompose_no[0]);
+        keymapFirst = s_keymap_dk;
+        keymapSize = sizeof(s_keymap_dk) / sizeof(s_keymap_dk[0]);
+        keycomposeFirst = s_keycompose_dk;
+        keycomposeSize = sizeof(s_keycompose_dk) / sizeof(s_keycompose_dk[0]);
         qCDebug(EpaperEvdevKeyboardLog) << "setting Danish keymap" << keymapSize << keycomposeSize;
         break;
     case EpaperEvdevInputLocale::Norway:
@@ -622,7 +622,7 @@ void EpaperEvdevKeyboardHandler::unloadKeymap()
         keymapSize = sizeof(s_keymap_se) / sizeof(s_keymap_se[0]);
         keycomposeFirst = s_keycompose_se;
         keycomposeSize = sizeof(s_keycompose_se) / sizeof(s_keycompose_se[0]);
-        qCDebug(EpaperEvdevKeyboardLog) << "setting Swedish keymap" << keymapSize << keycomposeSize;
+        qCDebug(EpaperEvdevKeyboardLog) << "setting Swedish/Finnish keymap" << keymapSize << keycomposeSize;
         break;
     case EpaperEvdevInputLocale::UnitedKingdom:
         keymapFirst = s_keymap_uk;
