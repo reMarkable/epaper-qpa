@@ -564,7 +564,7 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_fr[] = {
 
     // KEY_GRAVE (41)
     // "^" Combining Circumflex Accent 0x0302 (Dead Key)
-    // """ Combining Diaeresis 0x0308 (Dead Key)
+    // "¨" Combining Diaeresis 0x0308 (Dead Key)
     // "$" Dollar Sign 0x0024
     { KEY_GRAVE, 0x0302, Qt::Key_Dead_Circumflex, Modifiers::ModPlain, Flags::IsDead, 0x0000 },
     { KEY_GRAVE, 0x0308, Qt::Key_Dead_Diaeresis, Modifiers::ModShift, Flags::IsDead, 0x0000 },
@@ -576,9 +576,13 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_fr[] = {
     { KEY_LEFTSHIFT, 0xffff, 0x01000020, 0x00, 0x04, 0x0001 },
 
     // KEY_BACKSLASH (43)
-    { KEY_BACKSLASH, 0x005c, 0x0000005c, 0x00, 0x00, 0x0000 },
-    { KEY_BACKSLASH, 0x007c, 0x0000007c, 0x01, 0x00, 0x0000 },
-    { KEY_BACKSLASH, 0x005c, 0x0400005c, 0x04, 0x00, 0x0000 },
+    // This key only exists on the US physical layout.
+    // We implement the characters printed on the keys again
+    // in case user selects UK locale on a French keyboard.
+    // "~" Tilde 0x007e
+    // "¨" Combining Diaeresis 0x0308
+    { KEY_BACKSLASH, 0x007e, Qt::Key_AsciiTilde, 0x00, 0x00, 0x0000 },
+    { KEY_BACKSLASH, 0x0308, Qt::Key_Dead_Diaeresis, 0x01, 0x00, 0x0000 },
 
     // KEY_Z (44)
     // "w" Latin Small Letter W 0x0077

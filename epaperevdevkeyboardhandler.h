@@ -179,14 +179,15 @@ public:
     ~EpaperEvdevKeyboardHandler();
 
     enum class EpaperEvdevInputLocale {
-        NO_DK,
-        NO_NO,
-        NO_SV,
-        EN_UK,
-        EN_US,
-        ES_ES,
-        FR_FR,
-        DE_DE
+        Denmark,
+        Finland,
+        France,
+        Germany,
+        Norway,
+        Spain,
+        Sweden,
+        UnitedKingdom,
+        UnitedStates
     };
 
     enum KeycodeAction {

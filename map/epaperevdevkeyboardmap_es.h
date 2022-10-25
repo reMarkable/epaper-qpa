@@ -569,9 +569,13 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_es[] = {
     { KEY_LEFTSHIFT, 0xffff, 0x01000020, 0x00, 0x04, 0x0001 },
 
     // KEY_BACKSLASH (43)
-    { KEY_BACKSLASH, 0x005c, 0x0000005c, 0x00, 0x00, 0x0000 },
-    { KEY_BACKSLASH, 0x007c, 0x0000007c, 0x01, 0x00, 0x0000 },
-    { KEY_BACKSLASH, 0x005c, 0x0400005c, 0x04, 0x00, 0x0000 },
+    // This key only exists on the US physical layout.
+    // We implement the characters printed on the keys again
+    // in case user selects Spanish locale on a US keyboard.
+    // "~" Tilde 0x007e
+    // "¨" Combining Diaeresis 0x0308
+    { KEY_BACKSLASH, 0x007e, Qt::Key_AsciiTilde, 0x00, 0x00, 0x0000 },
+    { KEY_BACKSLASH, 0x0308, Qt::Key_Dead_Diaeresis, 0x01, 0x00, 0x0000 },
 
     // KEY_Z (44)
     // "<" Less-than sign 0x003c
