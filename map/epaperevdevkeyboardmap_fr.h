@@ -77,11 +77,11 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_fr[] = {
     // KEY_2 (3)
     // "é" Latin Small Letter E with Acute 0x00e9
     // "2" Digit Two 0x0032
-    // "~" Tilde 0x007e
+    // "̃ " Combining Tilde 0x0303
     { KEY_2, 0x00e9, Qt::Key_Eacute, 0x00, Flags::IsLetter, 0x0000 },
     { KEY_2, 0x0032, Qt::Key_2, Modifiers::ModShift, 0x00, 0x0000 },
-    { KEY_2, 0x007e, Qt::Key_2, Modifiers::ModAlt, Flags::IsDead, 0x0000 },
-    { KEY_2, 0x007e, Qt::Key_2, Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
+    { KEY_2, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAlt, Flags::IsDead, 0x0000 },
+    { KEY_2, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
 
     // KEY_3 (4)
     // """ Quotation Mark 0x0022
@@ -563,8 +563,8 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_fr[] = {
     { KEY_APOSTROPHE, 0x002a, Qt::Key_Asterisk, Modifiers::ModShift | Modifiers::ModAlt, 0x00, 0x0000 },
 
     // KEY_GRAVE (41)
-    // "^" Combining Circumflex Accent 0x0302 (Dead Key)
-    // "¨" Combining Diaeresis 0x0308 (Dead Key)
+    // "^" Combining Circumflex Accent 0x0302
+    // "¨" Combining Diaeresis 0x0308
     // "$" Dollar Sign 0x0024
     { KEY_GRAVE, 0x0302, Qt::Key_Dead_Circumflex, Modifiers::ModPlain, Flags::IsDead, 0x0000 },
     { KEY_GRAVE, 0x0308, Qt::Key_Dead_Diaeresis, Modifiers::ModShift, Flags::IsDead, 0x0000 },
@@ -579,10 +579,10 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_fr[] = {
     // This key only exists on the US physical layout.
     // We implement the characters printed on the keys again
     // in case user selects UK locale on a French keyboard.
-    // "~" Tilde 0x007e
+    // "̃ " Combining Tilde 0x0303
     // "¨" Combining Diaeresis 0x0308
-    { KEY_BACKSLASH, 0x007e, Qt::Key_AsciiTilde, 0x00, 0x00, 0x0000 },
-    { KEY_BACKSLASH, 0x0308, Qt::Key_Dead_Diaeresis, 0x01, 0x00, 0x0000 },
+    { KEY_BACKSLASH, 0x0303, Qt::Key_Dead_Tilde, 0x00, Flags::IsDead, 0x0000 },
+    { KEY_BACKSLASH, 0x0308, Qt::Key_Dead_Diaeresis, 0x01, Flags::IsDead, 0x0000 },
 
     // KEY_Z (44)
     // "w" Latin Small Letter W 0x0077

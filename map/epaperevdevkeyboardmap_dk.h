@@ -567,10 +567,10 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_dk[] = {
     // This key only exists on the US physical layout.
     // We implement the characters printed on the keys again
     // in case user selects Swedish locale on a US keyboard.
-    // "~" Tilde 0x007e
+    // "̃ " Combining Tilde 0x0303
     // "¨" Combining Diaeresis 0x0308
-    { KEY_BACKSLASH, 0x007e, Qt::Key_AsciiTilde, 0x00, 0x00, 0x0000 },
-    { KEY_BACKSLASH, 0x0308, Qt::Key_Dead_Diaeresis, 0x01, 0x00, 0x0000 },
+    { KEY_BACKSLASH, 0x0303, Qt::Key_Dead_Tilde, 0x00, Flags::IsDead, 0x0000 },
+    { KEY_BACKSLASH, 0x0308, Qt::Key_Dead_Diaeresis, 0x01, Flags::IsDead, 0x0000 },
 
     // KEY_Z (44)
     // "<" Less-Than Sign 0x003c
@@ -715,13 +715,13 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_dk[] = {
     // KEY_SLASH (53)
     // "-" Hyphen-Minus 0x002d
     // "_" Low Line 0x005f
-    // "~" Tilde 0x007e
+    // "̃ " Combining Tilde 0x0303
     { KEY_SLASH, 0x002d, Qt::Key_Minus, 0x00, 0x00, 0x0000 },
     { KEY_SLASH, 0x005f, Qt::Key_Underscore, Modifiers::ModShift, 0x00, 0x0000 },
-    { KEY_SLASH, 0x007e, Qt::Key_AsciiTilde, Modifiers::ModAlt, 0x00, 0x0000 },
-    { KEY_SLASH, 0x007e, Qt::Key_AsciiTilde, Modifiers::ModAltGr, 0x00, 0x0000 },
-    { KEY_SLASH, 0x007e, Qt::Key_AsciiTilde, Modifiers::ModShift | Modifiers::ModAlt, 0x00, 0x0000 },
-    { KEY_SLASH, 0x007e, Qt::Key_AsciiTilde, Modifiers::ModShift | Modifiers::ModAltGr, 0x00, 0x0000 },
+    { KEY_SLASH, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAlt, Flags::IsDead, 0x0000 },
+    { KEY_SLASH, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
+    { KEY_SLASH, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModShift | Modifiers::ModAlt, Flags::IsDead, 0x0000 },
+    { KEY_SLASH, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModShift | Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
 
     // KEY_RIGHTSHIFT (54)
     { KEY_RIGHTSHIFT, 0xffff, 0x01000020, 0x00, 0x04, 0x0001 },

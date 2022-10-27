@@ -550,9 +550,9 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_us_rm[] = {
     { KEY_LEFTSHIFT, 0xffff, 0x01000020, 0x00, 0x04, 0x0001 },
 
     // KEY_BACKSLASH (43)
-    // "~" Tilde 0x007e
+    // "̃ " Combining Tilde 0x0303
     // "¨" Combining Diaeresis 0x0308
-    { KEY_BACKSLASH, 0x007e, Qt::Key_AsciiTilde, Modifiers::ModPlain, 0x00, 0x0000 },
+    { KEY_BACKSLASH, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModPlain, Flags::IsDead, 0x0000 },
     { KEY_BACKSLASH, 0x0308, Qt::Key_Dead_Diaeresis, Modifiers::ModShift, Flags::IsDead, 0x0000 },
     
     // KEY_Z (44)
