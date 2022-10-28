@@ -548,15 +548,15 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_uk[] = {
     // "`" Grave Accent 0x0060
     // "´" Acute Accent 0x00b4
     // "¨" Combining Diaeresis 0x0308
-    // "~" Tilde 0x007e
+    // "̃ " Combining Tilde 0x0303
     { KEY_GRAVE, 0x0060, Qt::Key_Dead_Grave, 0x00, Flags::IsDead, 0x0000 },
     { KEY_GRAVE, 0x00b4, Qt::Key_Dead_Acute, Modifiers::ModShift, Flags::IsDead, 0x0000 },
     { KEY_GRAVE, 0x0308, Qt::Key_Dead_Diaeresis, Modifiers::ModAlt, Flags::IsDead, 0x0000 },
     { KEY_GRAVE, 0x0308, Qt::Key_Dead_Diaeresis, Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
-    { KEY_GRAVE, 0x007e, Qt::Key_AsciiTilde, Modifiers::ModAlt, 0x00, 0x0000 },
-    { KEY_GRAVE, 0x007e, Qt::Key_AsciiTilde, Modifiers::ModAltGr, 0x00, 0x0000 },
-    { KEY_GRAVE, 0x007e, Qt::Key_AsciiTilde, Modifiers::ModAlt | Modifiers::ModShift, 0x00, 0x0000 },
-    { KEY_GRAVE, 0x007e, Qt::Key_AsciiTilde, Modifiers::ModAltGr | Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_GRAVE, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAlt, Flags::IsDead, 0x0000 },
+    { KEY_GRAVE, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
+    { KEY_GRAVE, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAlt | Modifiers::ModShift, Flags::IsDead, 0x0000 },
+    { KEY_GRAVE, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAltGr | Modifiers::ModShift, Flags::IsDead, 0x0000 },
 
     { KEY_LEFTSHIFT, 0xffff, 0x01000020, 0x00, 0x04, 0x0001 },
 
@@ -564,10 +564,10 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_uk[] = {
     // This key only exists on the US physical layout.
     // We implement the characters printed on the keys again
     // in case user selects UK locale on a US keyboard.
-    // "~" Tilde 0x007e
+    // "̃ " Combining Tilde 0x0303
     // "¨" Combining Diaeresis 0x0308
-    { KEY_BACKSLASH, 0x007e, Qt::Key_AsciiTilde, 0x00, 0x00, 0x0000 },
-    { KEY_BACKSLASH, 0x0308, Qt::Key_Dead_Diaeresis, 0x01, 0x00, 0x0000 },
+    { KEY_BACKSLASH, 0x0303, Qt::Key_Dead_Tilde, 0x00, Flags::IsDead, 0x0000 },
+    { KEY_BACKSLASH, 0x0308, Qt::Key_Dead_Diaeresis, 0x01, Flags::IsDead, 0x0000 },
 
     // KEY_Z (44)
     { KEY_Z, 0x007a, 0x0000005a, 0x00, 0x02, 0x0000 },

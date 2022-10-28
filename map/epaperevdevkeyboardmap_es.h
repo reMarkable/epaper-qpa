@@ -96,11 +96,11 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_es[] = {
     // 4$~
     //"4"  DIGIT FOUR  Basic Latin 0x0034 0x3400
     //"$"  DOLLAR SIGN Basic Latin 0x0024 0x2400
-    //"~"  TILDE       Basic Latin 0x0024 0x2400
+    // "̃ " Combining Tilde 0x0303
     { KEY_4, 0x0034, 0x00000034, 0x00, 0x00, 0x0000 },
     { KEY_4, 0x0024, 0x00000024, Modifiers::ModShift, 0x00, 0x0000 },
-    { KEY_4, 0x007E, 0x0000007E, Modifiers::ModAlt, 0x00, 0x0000 },
-    { KEY_4, 0x007E, 0x0000007E, Modifiers::ModAltGr, 0x00, 0x0000 },
+    { KEY_4, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAlt, Flags::IsDead, 0x0000 },
+    { KEY_4, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
 
     // 5%
     //"5" DIGIT FIVE   Basic Latin 0x0035 0x3500
@@ -575,10 +575,10 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_es[] = {
     // This key only exists on the US physical layout.
     // We implement the characters printed on the keys again
     // in case user selects Spanish locale on a US keyboard.
-    // "~" Tilde 0x007e
+    // "̃ " Combining Tilde 0x0303
     // "¨" Combining Diaeresis 0x0308
-    { KEY_BACKSLASH, 0x007e, Qt::Key_AsciiTilde, 0x00, 0x00, 0x0000 },
-    { KEY_BACKSLASH, 0x0308, Qt::Key_Dead_Diaeresis, 0x01, 0x00, 0x0000 },
+    { KEY_BACKSLASH, 0x0303, Qt::Key_Dead_Tilde, 0x00, Flags::IsDead, 0x0000 },
+    { KEY_BACKSLASH, 0x0308, Qt::Key_Dead_Diaeresis, 0x01, Flags::IsDead, 0x0000 },
 
     // KEY_Z (44)
     // "<" Less-than sign 0x003c
