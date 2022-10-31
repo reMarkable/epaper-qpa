@@ -93,11 +93,24 @@ struct Mapping
     quint16 special;
 };
 
+inline auto tieMapping(Mapping const mapping) {
+    return std::tie(mapping.keycode, mapping.unicode, mapping.qtcode, mapping.modifiers, mapping.flags, mapping.special);
+}
+
+inline bool operator==(Mapping const a, Mapping const b) {
+    return tieMapping(a) == tieMapping(b);
+}
+
+inline bool operator!=(Mapping const a, Mapping const b) {
+    return tieMapping(a) != tieMapping(b);
+} 
+
 enum Flags {
     IsDead = 0x01,
     IsLetter = 0x02,
     IsModifier = 0x04,
-    IsSystem = 0x08
+    IsSystem = 0x08,
+    IsCapsLockException = 0x10,
 };
 
 enum System {
@@ -258,6 +271,9 @@ private:
     int m_keymap_size;
     const EpaperEvdevKeyboardMap::Composing *m_keycompose;
     int m_keycompose_size;
+
+    using PairVectorType = std::vector<std::pair<quint16, quint16>>;
+    PairVectorType m_capsLockException;
     QFileSystemWatcher m_watcher;
     QString m_firmwareLang;
     EpaperEvdevInputLocale m_prevLocale;
