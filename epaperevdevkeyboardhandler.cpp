@@ -40,6 +40,7 @@
 #include "epaperevdevkeyboardhandler.h"
 
 #include <optional>
+#include <algorithm>
 #include <qplatformdefs.h>
 
 #include <QCoreApplication>
@@ -100,6 +101,8 @@ namespace
         // TODO: What other values can be read from the firmware?
         if (langCode == "ES") {
             return EpaperEvdevInputLocale::Spain;
+        } else if (langCode == "FR") {
+            return EpaperEvdevInputLocale::France;
         } else if (langCode == "NO") {
             return EpaperEvdevInputLocale::Norway;
         } else if (langCode == "UK") {
@@ -321,8 +324,7 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
     KeycodeAction result = None;
     bool first_press = pressed && !autorepeat;
 
-    const EpaperEvdevKeyboardMap::Mapping *map_plain = 0;
-    const EpaperEvdevKeyboardMap::Mapping *map_withmod = 0;
+    std::optional<EpaperEvdevKeyboardMap::Mapping> map_plain, map_withmod;
 
     quint8 modifiers = m_modifiers;
 
@@ -331,26 +333,45 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
         const EpaperEvdevKeyboardMap::Mapping *m = m_keymap + i;
         if (m->keycode == keycode) {
             if (m->modifiers == 0)
-                map_plain = m;
+            {
+                map_plain = *m;
 
+                if (m_locks[0] /*CapsLock*/ &&
+                    m->flags & EpaperEvdevKeyboardMap::IsCapsLockException)
+                {
+                    // If caps lock is pressed, no modifiers (shift, alt, etc.) are present and the character is flagged as caps lock exception;
+                    // print the character mapped under m_capsLockException and skip the other checks.
+                    // E.g.: KEY_0 on French locale: Plain: "à", shift: "0", alt/altgr: "@", caps lock: "À".
+                    // Note how caps lock prints a character different than plain and shift, which is an "IsCapsLockException" case.
+                    auto const exceptionFound = std::find_if(
+                        m_capsLockException.begin(),
+                        m_capsLockException.end(),
+                        [m](auto const exception) {
+                            return m->unicode == exception.first;
+                        });
+                    if (exceptionFound != m_capsLockException.end())
+                    {
+                        map_plain->unicode = exceptionFound->second;
+                    }
+                }
+            }
             quint8 testmods = m_modifiers;
             if (m_locks[0] /*CapsLock*/ && (m->flags & EpaperEvdevKeyboardMap::IsLetter))
                 testmods ^= EpaperEvdevKeyboardMap::ModShift;
-            if (m->modifiers == testmods)
-                map_withmod = m;
+            if (m->modifiers == testmods && m->modifiers != EpaperEvdevKeyboardMap::ModPlain)
+            {
+                map_withmod = *m;
+            }
         }
     }
 
     if (m_locks[0] /*CapsLock*/ && map_withmod && (map_withmod->flags & EpaperEvdevKeyboardMap::IsLetter))
         modifiers ^= EpaperEvdevKeyboardMap::ModShift;
 
-    qCDebug(EpaperEvdevKeyboardMapLog, "Processing key event: keycode=%3d, modifiers=%02x pressed=%d, autorepeat=%d  |  plain=%d, withmod=%d, size=%d",
-            keycode, modifiers, pressed ? 1 : 0, autorepeat ? 1 : 0,
-            int(map_plain ? map_plain - m_keymap : -1),
-            int(map_withmod ? map_withmod - m_keymap : -1),
-            m_keymap_size);
+    qCDebug(EpaperEvdevKeyboardMapLog, "Processing key event: keycode=%3d, modifiers=%02x pressed=%d, autorepeat=%d",
+            keycode, modifiers, pressed ? 1 : 0, autorepeat ? 1 : 0);
 
-    const EpaperEvdevKeyboardMap::Mapping *it = map_withmod ? map_withmod : map_plain;
+    std::optional<EpaperEvdevKeyboardMap::Mapping> it = map_withmod ? map_withmod : map_plain;
 
     if (!it) {
         // we couldn't even find a plain mapping
@@ -599,6 +620,7 @@ void EpaperEvdevKeyboardHandler::unloadKeymap()
         qCWarning(EpaperEvdevKeyboardLog) << "No keymap set by QT settings or firmware, defaulting to US.";
     }
     m_prevLocale = keymap;
+    m_capsLockException.clear();
 
     switch (keymap) {
     case EpaperEvdevInputLocale::Denmark:
@@ -650,6 +672,8 @@ void EpaperEvdevKeyboardHandler::unloadKeymap()
         keymapSize = sizeof(s_keymap_fr) / sizeof(s_keymap_fr[0]);
         keycomposeFirst = s_keycompose_fr;
         keycomposeSize = sizeof(s_keycompose_fr) / sizeof(s_keycompose_fr[0]);
+        // French has exceptions where caps lock is neither ignored nor treated the same with shift modifier.
+        m_capsLockException = s_capslock_exception_fr;
         qCDebug(EpaperEvdevKeyboardLog) << "setting French keymap" << keymapSize << keycomposeSize;
         break;
     case EpaperEvdevInputLocale::Germany:
