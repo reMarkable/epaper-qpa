@@ -93,15 +93,15 @@ struct Mapping
     quint16 special;
 };
 
-inline auto tieMapping(Mapping const mapping) {
+inline auto tieMapping(Mapping const& mapping) {
     return std::tie(mapping.keycode, mapping.unicode, mapping.qtcode, mapping.modifiers, mapping.flags, mapping.special);
 }
 
-inline bool operator==(Mapping const a, Mapping const b) {
+inline bool operator==(Mapping const& a, Mapping const& b) {
     return tieMapping(a) == tieMapping(b);
 }
 
-inline bool operator!=(Mapping const a, Mapping const b) {
+inline bool operator!=(Mapping const& a, Mapping const& b) {
     return tieMapping(a) != tieMapping(b);
 } 
 
