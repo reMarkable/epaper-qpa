@@ -98,8 +98,10 @@ namespace
             return {};
         }
 
-        // TODO: What other values can be read from the firmware?
-        if (langCode == "ES") {
+        // Possible language codes in firmware are listed in remarkable/linux-internal repo.
+        if (langCode == "DE") {
+            return EpaperEvdevInputLocale::Germany;
+        } else if (langCode == "ES") {
             return EpaperEvdevInputLocale::Spain;
         } else if (langCode == "FR") {
             return EpaperEvdevInputLocale::France;
@@ -109,6 +111,10 @@ namespace
             return EpaperEvdevInputLocale::UnitedKingdom;
         } else if (langCode == "US") {
             return EpaperEvdevInputLocale::UnitedStates;
+        } else {
+            // "ILLEGAL": Ideally should not be reported, but exists in the code.
+            // "IT", "PT": Implementation of Italian and Portuguese have been postponed indefinitely.
+            return EpaperEvdevInputLocale::UnitedKingdom;
         }
 
         return {};
