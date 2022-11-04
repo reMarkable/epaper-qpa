@@ -83,15 +83,14 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_es[] = {
     { KEY_2, 0x0040, 0x00000040, Modifiers::ModAlt, 0x00, 0x0000 },
     { KEY_2, 0x0040, 0x00000040, Modifiers::ModAltGr, 0x00, 0x0000 },
 
-    // 3·#
+    // 3#·
     //"3"  DIGIT THREE Basic Latin        0x0033 0x3300
-    //"·"  MIDDLE DOT  Latin-1 Supplement 0x00B7 0xB700
     //"#"  NUMBER SIGN Basic Latin        0x0023 0x2300
+    //"·"  MIDDLE DOT  Latin-1 Supplement 0x00B7 0xB700
     { KEY_3, 0x0033, 0x00000033, 0x00, 0x00, 0x0000 },
-    { KEY_3, 0x00B7, 0x000000B7, Modifiers::ModShift, 0x00, 0x0000 },
-    { KEY_3, 0x0023, 0x00000023, Modifiers::ModAlt, 0x00, 0x0000 },
-    { KEY_3, 0x0023, 0x00000023, Modifiers::ModAltGr, 0x00, 0x0000 },
-    
+    { KEY_3, 0x0023, 0x00000023, Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_3, 0x00B7, 0x000000B7, Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_3, 0x00B7, 0x000000B7, Modifiers::ModAltGr, 0x00, 0x0000 },
 
     // 4$~
     //"4"  DIGIT FOUR  Basic Latin 0x0034 0x3400
