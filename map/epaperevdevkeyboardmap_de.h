@@ -57,14 +57,16 @@
 #include "linux/input.h"
 #endif
 
-using namespace EpaperEvdevKeyboardMap;
-
 // no QT_BEGIN_NAMESPACE, since we include it internally...
 
 // Reference for Unicode names and values: https://unicode-table.com/en/
 // Reference for QT key enums: https://doc.qt.io/qt-5/qt.html#Key-enum
 
-const EpaperEvdevKeyboardMap::Mapping s_keymap_de[] = {
+namespace EpaperEvdevKeyboardMap {
+namespace Locale {
+
+struct Germany {
+constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { 1, 0xffff, 0x01000000, 0x00, 0x00, 0x0000 },
 
     // KEY_1 (2)
@@ -926,7 +928,9 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_de[] = {
     { KEY_CHANNELDOWN, 0xffff, Qt::Key_ChannelDown, 0x00, 0x00, 0x0000 },
 };
 
-const EpaperEvdevKeyboardMap::Composing s_keycompose_de[] = {
+constexpr static size_t keymapSize = sizeof(keymap) / sizeof(keymap[0]);
+
+constexpr static EpaperEvdevKeyboardMap::Composing keycompose[] = {
     { 0x0060, 0x0041, 0x00c0 },
     { 0x0060, 0x0061, 0x00e0 },
     { 0x0027, 0x0041, 0x00c1 },
@@ -1075,3 +1079,9 @@ const EpaperEvdevKeyboardMap::Composing s_keycompose_de[] = {
     { 0x0069, 0x006a, 0x00ff },
     { 0x0049, 0x004a, 0x0178 },
 };
+
+constexpr static size_t keycomposeSize = sizeof(keycompose) / sizeof(keycompose[0]);
+};
+
+} // namespace Locale
+} // namespace EpaperEvdevKeyboardMap

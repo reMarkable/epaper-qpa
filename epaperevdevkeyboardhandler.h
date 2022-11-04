@@ -51,7 +51,7 @@
 //
 
 #include <QDataStream>
-#include <QFileSystemWatcher> 
+#include <QFileSystemWatcher>
 #include <QTimer>
 #include <qobject.h>
 
@@ -63,6 +63,11 @@ class QSocketNotifier;
 
 namespace EpaperEvdevKeyboardMap {
 const quint32 FileMagic = 0x514d4150; // 'QMAP'
+
+enum InputFlavor {
+    Windows,
+    Apple
+};
 
 // A Mapping encodes a way to go from an evdev keycode (and set of modifiers) to a
 // Qt key, and perhaps a special action, etc.
@@ -103,7 +108,7 @@ inline bool operator==(Mapping const& a, Mapping const& b) {
 
 inline bool operator!=(Mapping const& a, Mapping const& b) {
     return tieMapping(a) != tieMapping(b);
-} 
+}
 
 enum Flags {
     IsDead = 0x01,
@@ -247,11 +252,15 @@ public:
     void readKeycode();
     KeycodeAction processKeycode(quint16 keycode, bool pressed, bool autorepeat);
     void setCapsLockEnabled(bool enabled);
+    void setInputFlavor(EpaperEvdevKeyboardMap::InputFlavor flavor);
 
 private:
     void processKeyEvent(int nativecode, int unicode, int qtcode,
                          Qt::KeyboardModifiers modifiers, bool isPress, bool autoRepeat);
     void switchLed(int, bool);
+
+    template<typename LocaleType>
+    void populateKeymap();
 
     QString m_device;
     EpaperEvdevFdContainer m_fd;
@@ -267,16 +276,16 @@ private:
     bool m_do_compose;
 
     bool m_didLoadKeymap = false;
-    const EpaperEvdevKeyboardMap::Mapping *m_keymap;
+    EpaperEvdevKeyboardMap::Mapping* m_keymap;
     int m_keymap_size;
-    const EpaperEvdevKeyboardMap::Composing *m_keycompose;
+    const EpaperEvdevKeyboardMap::Composing* m_keycompose;
     int m_keycompose_size;
 
-    using PairVectorType = std::vector<std::pair<quint16, quint16>>;
-    PairVectorType m_capsLockException;
+    std::vector<std::pair<quint16, quint16>> m_capsLockException;
     QFileSystemWatcher m_watcher;
     QString m_firmwareLang;
     EpaperEvdevInputLocale m_prevLocale;
+    EpaperEvdevKeyboardMap::InputFlavor m_flavor;
 
 private slots:
     void onSettingsChanged();

@@ -57,14 +57,16 @@
 #include "linux/input.h"
 #endif
 
-using namespace EpaperEvdevKeyboardMap;
-
 // no QT_BEGIN_NAMESPACE, since we include it internally...
 
 // Reference for Unicode names and values: https://unicode-table.com/en/
 // Reference for QT key enums: https://doc.qt.io/qt-5/qt.html#Key-enum
 
-const EpaperEvdevKeyboardMap::Mapping s_keymap_no[] = {
+namespace EpaperEvdevKeyboardMap {
+namespace Locale {
+
+struct Norway {
+constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { 1, 0xffff, 0x01000000, 0x00, 0x00, 0x0000 },
 
     // KEY_1 (2)
@@ -350,9 +352,6 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_no[] = {
 
     // KEY_ENTER (28)
     { KEY_ENTER, 0xffff, 0x01000004, 0x00, 0x00, 0x0000 },
-
-    // KEY_LEFTCTRL (29)
-    { KEY_LEFTCTRL, 0xffff, 0x01000021, 0x00, 0x04, 0x0004 }, // 0x04 => Flags::IsModifier, 0x0004 => Modifiers::ModControl, so apply ModControl when KEY_LEFTCTRL is pressed?
 
     // KEY_A (30)
     { KEY_A, 0x0061, 0x00000041, 0x00, 0x02, 0x0000 },
@@ -728,9 +727,6 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_no[] = {
     // Non-esistent
     { 55, 0x002a, 0x2000002a, 0x00, 0x00, 0x0000 },
 
-    // KEY_LEFTALT (56)
-    { KEY_LEFTALT, 0xffff, 0x01000023, 0x00, 0x04, 0x0008 },
-
     // KEY_SPACE (57)
     { KEY_SPACE, 0x0020, 0x00000020, 0x00, 0x00, 0x0000 },
 
@@ -808,17 +804,9 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_no[] = {
     { 88, 0xffff, 0x01000000, 0x0c, 0x08, 0x010b },
     { 96, 0xffff, 0x21000005, 0x00, 0x00, 0x0000 },
 
-    { KEY_RIGHTCTRL, 0xffff, 0x01000021, 0x00, 0x04, 0x0004 },
-
     // Non-existent
     { 98, 0x002f, 0x2000002f, 0x00, 0x00, 0x0000 },
     { 99, 0x005c, 0x0400005c, 0x00, 0x00, 0x0000 },
-
-    // KEY_RIGHTALT (100)
-    { KEY_RIGHTALT, 0xffff, 0x01001103, 0x00, 0x04, 0x0002 },
-
-    // KEY_HOME (102)
-    { KEY_HOME, 0xffff, 0x01000010, 0x00, 0x00, 0x0000 },
 
     // KEY_UP (103)
     { KEY_UP, 0xffff, 0x01000013, 0x00, 0x00, 0x0000 },
@@ -833,9 +821,6 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_no[] = {
     // KEY_RIGHT (106)
     { KEY_RIGHT, 0xffff, 0x01000014, 0x00, 0x00, 0x0000 },
     { KEY_RIGHT, 0xffff, 0x01000000, 0x0c, 0x08, 0x0181 },
-
-    // KEY_END (107)
-    { KEY_END, 0xffff, 0x01000011, 0x00, 0x00, 0x0000 },
 
     // KEY_DOWN (108)
     { KEY_DOWN, 0xffff, 0x01000015, 0x00, 0x00, 0x0000 },
@@ -877,7 +862,9 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_no[] = {
     { KEY_CHANNELDOWN, 0xffff, Qt::Key_ChannelDown, 0x00, 0x00, 0x0000 },
 };
 
-const EpaperEvdevKeyboardMap::Composing s_keycompose_no[] = {
+constexpr static size_t keymapSize = sizeof(keymap) / sizeof(keymap[0]);
+
+constexpr static EpaperEvdevKeyboardMap::Composing keycompose[] = {
     { 0x0060, 0x0041, 0x00c0 },
     { 0x0060, 0x0061, 0x00e0 },
     { 0x0027, 0x0041, 0x00c1 },
@@ -1026,3 +1013,9 @@ const EpaperEvdevKeyboardMap::Composing s_keycompose_no[] = {
     { 0x0069, 0x006a, 0x00ff },
     { 0x0049, 0x004a, 0x0178 },
 };
+
+constexpr static size_t keycomposeSize = sizeof(keycompose) / sizeof(keycompose[0]);
+};
+
+} // namespace Locale
+} // namespace EpaperEvdevKeyboardMap

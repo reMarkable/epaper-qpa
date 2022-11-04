@@ -16,12 +16,15 @@ HEADERS =   epaperintegration.h \
             epaperevdevkeyboardmanager.h
 
 HEADERS += \
-    map/epaperevdevkeyboardmap_no.h \
-    map/epaperevdevkeyboardmap_us.h \
-    map/epaperevdevkeyboardmap_us_rm.h \
+    map/epaperevdevkeyboardmap_de.h \
+    map/epaperevdevkeyboardmap_dk.h \
     map/epaperevdevkeyboardmap_es.h \
+    map/epaperevdevkeyboardmap_flavor.h \
     map/epaperevdevkeyboardmap_fr.h \
-    map/epaperevdevkeyboardmap_uk.h
+    map/epaperevdevkeyboardmap_no.h \
+    map/epaperevdevkeyboardmap_se.h \
+    map/epaperevdevkeyboardmap_uk.h \
+    map/epaperevdevkeyboardmap_us_rm.h \
 
 OTHER_FILES += minimal.json
 

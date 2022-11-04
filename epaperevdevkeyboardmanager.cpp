@@ -153,6 +153,13 @@ void EpaperEvdevKeyboardManager::setCapsLockEnabled(bool enabled)
     }
 }
 
+void EpaperEvdevKeyboardManager::setInputFlavor(EpaperEvdevKeyboardMap::InputFlavor flavor)
+{
+    for (auto const& keyboard : m_keyboards) {
+        keyboard.handler->setInputFlavor(flavor);
+    }
+}
+
 void EpaperEvdevKeyboardManager::loadKeymap(const QString &file)
 {
     m_defaultKeymapFile = file;
