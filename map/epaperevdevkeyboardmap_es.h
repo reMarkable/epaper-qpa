@@ -158,7 +158,7 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_es[] = {
 
     // KEY_BACKSPACE (14)
     { KEY_BACKSPACE, 0xffff, Qt::Key_Backspace, 0x00, 0x00, 0x0000 },
-    { KEY_BACKSPACE, 0xffff, Qt::Key_Escape, 0x0c, 0x08, 0x0300 },
+    { KEY_BACKSPACE, 0xffff, Qt::Key_Delete, Modifiers::ModShift, 0x00, 0x0000 },
 
     // KEY_TAB (15)
     { KEY_TAB, 0xffff, 0x01000001, 0x00, 0x00, 0x0000 },
