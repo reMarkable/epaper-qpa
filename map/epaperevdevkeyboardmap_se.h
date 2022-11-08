@@ -554,8 +554,8 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_se[] = {
     // "Å" Latin Capital Letter a with Ring Above 0x00c5
     // "^" Combining Circumflex Accent 0x0302
     // "¨" Combining Diaeresis 0x0308
-    { KEY_GRAVE, 0x00e5, Qt::Key_Aring, 0x00, 0x00, 0x0000 },
-    { KEY_GRAVE, 0x00c5, Qt::Key_Aring, Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_GRAVE, 0x00e5, Qt::Key_Aring, 0x00, Flags::IsLetter, 0x0000 },
+    { KEY_GRAVE, 0x00c5, Qt::Key_Aring, Modifiers::ModShift, Flags::IsLetter, 0x0000 },
     { KEY_GRAVE, 0x0302, Qt::Key_Dead_Circumflex, Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
     { KEY_GRAVE, 0x0302, Qt::Key_Dead_Circumflex, Modifiers::ModAlt, Flags::IsDead, 0x0000 },
     { KEY_GRAVE, 0x0308, Qt::Key_Dead_Diaeresis, Modifiers::ModShift | Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
