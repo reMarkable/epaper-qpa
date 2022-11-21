@@ -137,6 +137,10 @@ QFunctionPointer EpaperIntegration::platformFunction(const QByteArray &function)
         return QFunctionPointer(seabirdCapsLockEnableStatic);
     } else if (function == "rm_seabirdCapsLockDisable") {
         return QFunctionPointer(seabirdCapsLockDisableStatic);
+    } else if (function == "rm_setInputFlavorWindows") {
+        return QFunctionPointer(seabirdSetInputFlavorWindows);
+    } else if (function == "rm_setInputFlavorApple") {
+        return QFunctionPointer(seabirdSetInputFlavorApple);
     }
 
     return nullptr;
@@ -158,6 +162,15 @@ void EpaperIntegration::seabirdCapsLockDisableStatic()
 {
     EpaperIntegration *self = EpaperIntegration::instance();
     self->m_keyboardManager->setCapsLockEnabled(false);
+}
+
+void EpaperIntegration::seabirdSetInputFlavorWindows() // static
+{
+    EpaperIntegration::instance()->m_keyboardManager->setInputFlavor(EpaperEvdevKeyboardMap::Windows);
+}
+void EpaperIntegration::seabirdSetInputFlavorApple() // static
+{
+    EpaperIntegration::instance()->m_keyboardManager->setInputFlavor(EpaperEvdevKeyboardMap::Apple);
 }
 
 EpaperIntegration *EpaperIntegration::instance()

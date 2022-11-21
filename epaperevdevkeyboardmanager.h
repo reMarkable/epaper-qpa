@@ -73,6 +73,7 @@ public:
     void removeKeyboard(const QString &deviceNode);
 
     void setCapsLockEnabled(bool enabled);
+    void setInputFlavor(EpaperEvdevKeyboardMap::InputFlavor flavor);
 
 private:
     void updateDeviceCount();

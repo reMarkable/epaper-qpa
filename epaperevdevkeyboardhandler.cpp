@@ -160,7 +160,7 @@ EpaperEvdevKeyboardHandler::EpaperEvdevKeyboardHandler(const QString &device, Ep
     m_device(device), m_fd(fd.release()), m_notify(nullptr),
     m_modifiers(0), m_composing(0), m_dead_unicode(0xffff),
     m_no_zap(disableZap), m_do_compose(enableCompose),
-    m_keymap(0), m_keymap_size(0), m_keycompose(0), m_keycompose_size(0)
+    m_keymap(nullptr), m_keymap_size(0), m_keycompose(nullptr), m_keycompose_size(0)
 {
     qCDebug(EpaperEvdevKeyboardLog) << "Create keyboard handler with for device" << device;
 
@@ -168,6 +168,13 @@ EpaperEvdevKeyboardHandler::EpaperEvdevKeyboardHandler(const QString &device, Ep
     m_watcher.addPath(qtSettings.fileName());
     this->onSettingsChanged();
     connect(&m_watcher, &QFileSystemWatcher::fileChanged, this, &EpaperEvdevKeyboardHandler::onSettingsChanged);
+
+    // Try to fetch the flavor from the config. This is done from the config only the first time,
+    // afterwards flavor changes are handled through setInputFlavor calls from app-side.
+    m_flavor = EpaperEvdevKeyboardMap::InputFlavor::Windows; // default
+    if (qtSettings.value("InputFlavor").toString() == "Apple") {
+        m_flavor = EpaperEvdevKeyboardMap::InputFlavor::Apple;
+    }
 
     setObjectName(QLatin1String("LinuxInput Keyboard Handler"));
 
@@ -352,7 +359,7 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
                     auto const exceptionFound = std::find_if(
                         m_capsLockException.begin(),
                         m_capsLockException.end(),
-                        [m](auto const exception) {
+                        [m](auto const& exception) {
                             return m->unicode == exception.first;
                         });
                     if (exceptionFound != m_capsLockException.end())
@@ -581,8 +588,8 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
 }
 
 // builtin keymaps
+#include "map/epaperevdevkeyboardmap_flavor.h"
 #include "map/epaperevdevkeyboardmap_no.h"
-#include "map/epaperevdevkeyboardmap_us.h"
 #include "map/epaperevdevkeyboardmap_us_rm.h"
 #include "map/epaperevdevkeyboardmap_es.h"
 #include "map/epaperevdevkeyboardmap_fr.h"
@@ -597,16 +604,6 @@ void EpaperEvdevKeyboardHandler::unloadKeymap()
 
     QSettings settings;
     QString locale = settings.value("InputLocale").toString();
-
-    if (m_didLoadKeymap) {
-        delete[] m_keymap;
-        delete[] m_keycompose;
-    }
-
-    const EpaperEvdevKeyboardMap::Mapping *keymapFirst = nullptr;
-    int keymapSize = 0;
-    const EpaperEvdevKeyboardMap::Composing *keycomposeFirst = nullptr;
-    int keycomposeSize = 0;
 
     // Check if input locale is set in xochitl.conf (set from type folio settings in the GUI).
     // If not, fetch the layout from the firmware and make assumptions (e.g. that nordic keyboard is Norwegian and not Swedish).
@@ -628,87 +625,47 @@ void EpaperEvdevKeyboardHandler::unloadKeymap()
     m_prevLocale = keymap;
     m_capsLockException.clear();
 
+    using namespace EpaperEvdevKeyboardMap;
     switch (keymap) {
     case EpaperEvdevInputLocale::Denmark:
-        keymapFirst = s_keymap_dk;
-        keymapSize = sizeof(s_keymap_dk) / sizeof(s_keymap_dk[0]);
-        keycomposeFirst = s_keycompose_dk;
-        keycomposeSize = sizeof(s_keycompose_dk) / sizeof(s_keycompose_dk[0]);
-        qCDebug(EpaperEvdevKeyboardLog) << "setting Danish keymap" << keymapSize << keycomposeSize;
+        populateKeymap<Locale::Denmark>();
+        qCDebug(EpaperEvdevKeyboardLog) << "setting Danish keymap" << m_keymap_size << m_keycompose_size;
         break;
     case EpaperEvdevInputLocale::Norway:
-        keymapFirst = s_keymap_no;
-        keymapSize = sizeof(s_keymap_no) / sizeof(s_keymap_no[0]);
-        keycomposeFirst = s_keycompose_no;
-        keycomposeSize = sizeof(s_keycompose_no) / sizeof(s_keycompose_no[0]);
-        qCDebug(EpaperEvdevKeyboardLog) << "setting Norwegian keymap" << keymapSize << keycomposeSize;
+        populateKeymap<Locale::Norway>();
+        qCDebug(EpaperEvdevKeyboardLog) << "setting Norwegian keymap" << m_keymap_size << m_keycompose_size;
         break;
     case EpaperEvdevInputLocale::Finland:
     case EpaperEvdevInputLocale::Sweden:
         // Finnish and Swedish layouts are the same.
-        keymapFirst = s_keymap_se;
-        keymapSize = sizeof(s_keymap_se) / sizeof(s_keymap_se[0]);
-        keycomposeFirst = s_keycompose_se;
-        keycomposeSize = sizeof(s_keycompose_se) / sizeof(s_keycompose_se[0]);
-        qCDebug(EpaperEvdevKeyboardLog) << "setting Swedish/Finnish keymap" << keymapSize << keycomposeSize;
+        populateKeymap<Locale::Sweden>();
+        qCDebug(EpaperEvdevKeyboardLog) << "setting Swedish/Finnish keymap" << m_keymap_size << m_keycompose_size;
         break;
     case EpaperEvdevInputLocale::UnitedKingdom:
-        keymapFirst = s_keymap_uk;
-        keymapSize = sizeof(s_keymap_uk) / sizeof(s_keymap_uk[0]);
-        keycomposeFirst = s_keycompose_uk;
-        keycomposeSize = sizeof(s_keycompose_uk) / sizeof(s_keycompose_uk[0]);
-        qCDebug(EpaperEvdevKeyboardLog) << "setting UK keymap" << keymapSize << keycomposeSize;
+        populateKeymap<Locale::UnitedKingdom>();
+        qCDebug(EpaperEvdevKeyboardLog) << "setting UK keymap" << m_keymap_size << m_keycompose_size;
         break;
     case EpaperEvdevInputLocale::UnitedStates:
-        keymapFirst = s_keymap_us_rm;
-        keymapSize = sizeof(s_keymap_us_rm) / sizeof(s_keymap_us_rm[0]);
-        keycomposeFirst = s_keycompose_us_rm;
-        keycomposeSize = sizeof(s_keycompose_us_rm) / sizeof(s_keycompose_us_rm[0]);
-        qCDebug(EpaperEvdevKeyboardLog) << "setting US keymap" << keymapSize << keycomposeSize;
+        populateKeymap<Locale::UnitedStates>();
+        qCDebug(EpaperEvdevKeyboardLog) << "setting US keymap" << m_keymap_size << m_keycompose_size;
         break;
     case EpaperEvdevInputLocale::Spain:
-        keymapFirst = s_keymap_es;
-        keymapSize = sizeof(s_keymap_es) / sizeof(s_keymap_es[0]);
-        keycomposeFirst = s_keycompose_es;
-        keycomposeSize = sizeof(s_keycompose_es) / sizeof(s_keycompose_es[0]);
-        qCDebug(EpaperEvdevKeyboardLog) << "setting Spanish keymap" << keymapSize << keycomposeSize;
+        populateKeymap<Locale::Spain>();
+        qCDebug(EpaperEvdevKeyboardLog) << "setting Spanish keymap" << m_keymap_size << m_keycompose_size;
         break;
     case EpaperEvdevInputLocale::France:
-        keymapFirst = s_keymap_fr;
-        keymapSize = sizeof(s_keymap_fr) / sizeof(s_keymap_fr[0]);
-        keycomposeFirst = s_keycompose_fr;
-        keycomposeSize = sizeof(s_keycompose_fr) / sizeof(s_keycompose_fr[0]);
+        populateKeymap<Locale::France>();
         // French has exceptions where caps lock is neither ignored nor treated the same with shift modifier.
-        m_capsLockException = s_capslock_exception_fr;
-        qCDebug(EpaperEvdevKeyboardLog) << "setting French keymap" << keymapSize << keycomposeSize;
+        m_capsLockException.assign(std::cbegin(Locale::France::capsLockException), std::cend(Locale::France::capsLockException));
+        qCDebug(EpaperEvdevKeyboardLog) << "setting French keymap" << m_keymap_size << m_keycompose_size;
         break;
     case EpaperEvdevInputLocale::Germany:
-        keymapFirst = s_keymap_de;
-        keymapSize = sizeof(s_keymap_de) / sizeof(s_keymap_de[0]);
-        keycomposeFirst = s_keycompose_de;
-        keycomposeSize = sizeof(s_keycompose_de) / sizeof(s_keycompose_de[0]);
-        qCDebug(EpaperEvdevKeyboardLog) << "setting German keymap" << keymapSize << keycomposeSize;
+        populateKeymap<Locale::Germany>();
+        qCDebug(EpaperEvdevKeyboardLog) << "setting German keymap" << m_keymap_size << m_keycompose_size;
         break;
     default:
         qCWarning(EpaperEvdevKeyboardLog) << "setting *no* keymap! uh oh!";
     }
-
-    EpaperEvdevKeyboardMap::Mapping *qmap_keymap = new EpaperEvdevKeyboardMap::Mapping[keymapSize];
-    for (int i = 0; i < keymapSize; ++i) {
-        qmap_keymap[i] = keymapFirst[i];
-    }
-    m_keymap = qmap_keymap;
-    m_keymap_size = keymapSize;
-
-    EpaperEvdevKeyboardMap::Composing *qmap_keycompose = new EpaperEvdevKeyboardMap::Composing[keycomposeSize];
-    for (int i = 0; i < keycomposeSize; ++i) {
-        qmap_keycompose[i] = keycomposeFirst[i];
-    }
-    m_keycompose = qmap_keycompose;
-    m_keycompose_size = keycomposeSize;
-
-    // we allocated the keymap, so we must unload it...
-    m_didLoadKeymap = true;
 
     // reset state, so we could switch keymaps at runtime
     m_modifiers = 0;
@@ -741,7 +698,7 @@ void EpaperEvdevKeyboardHandler::unloadKeymap()
 bool EpaperEvdevKeyboardHandler::loadKeymap(const QString &file)
 {
     qCDebug(EpaperEvdevKeyboardLog, "Loading keymap %ls", qUtf16Printable(file));
-    
+
     QFile f(file);
 
     if (!f.open(QIODevice::ReadOnly)) {
@@ -803,6 +760,15 @@ void EpaperEvdevKeyboardHandler::setCapsLockEnabled(bool enabled)
     m_locks[0] = enabled ? 1 : 0;
 }
 
+void EpaperEvdevKeyboardHandler::setInputFlavor(EpaperEvdevKeyboardMap::InputFlavor flavor)
+{
+    qCDebug(EpaperEvdevKeyboardLog) << "Input flavor is set to " << ((flavor == EpaperEvdevKeyboardMap::InputFlavor::Windows) ? "Windows" : "Apple");
+    if (flavor != m_flavor) {
+        m_flavor = flavor;
+        unloadKeymap();
+    }
+}
+
 void EpaperEvdevKeyboardHandler::onSettingsChanged()
 {
     // Need to remove and readd file on watchlist for some reason...
@@ -817,4 +783,30 @@ void EpaperEvdevKeyboardHandler::onSettingsChanged()
         // `m_prevLocale = newLocale` done inside unloadKeymap()
     }
 }
+
+template<typename LocaleType>
+void EpaperEvdevKeyboardHandler::populateKeymap() {
+    delete[] m_keymap;
+    m_keymap = nullptr;
+
+    using namespace EpaperEvdevKeyboardMap::Flavor;
+    auto const flavorMapSize = (m_flavor == EpaperEvdevKeyboardMap::InputFlavor::Windows ?
+        Windows::keymapSize :
+        Apple::keymapSize);
+
+    auto const& flavorMap = (m_flavor == EpaperEvdevKeyboardMap::InputFlavor::Windows ?
+        Windows::keymap :
+        Apple::keymap);
+
+    m_keymap_size = LocaleType::keymapSize + flavorMapSize;
+    m_keymap = new EpaperEvdevKeyboardMap::Mapping[m_keymap_size];
+
+    // Populate m_keymap with contents of locale map and flavor map, concatanated.
+    auto endIter = std::copy(LocaleType::keymap, LocaleType::keymap + LocaleType::keymapSize, m_keymap);
+    std::copy(flavorMap, flavorMap + flavorMapSize, endIter);
+
+    m_keycompose_size = LocaleType::keycomposeSize;
+    m_keycompose = LocaleType::keycompose;
+}
+
 QT_END_NAMESPACE

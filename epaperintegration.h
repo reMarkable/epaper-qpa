@@ -91,6 +91,8 @@ private:
     static void seabirdConnectionChangedStatic();
     static void seabirdCapsLockEnableStatic();
     static void seabirdCapsLockDisableStatic();
+    static void seabirdSetInputFlavorWindows();
+    static void seabirdSetInputFlavorApple();
 
     mutable QPlatformFontDatabase *m_fontDatabase;
     QPlatformInputContext *m_inputContext;

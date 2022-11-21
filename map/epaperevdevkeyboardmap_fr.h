@@ -57,14 +57,16 @@
 #include "linux/input.h"
 #endif
 
-using namespace EpaperEvdevKeyboardMap;
-
 // no QT_BEGIN_NAMESPACE, since we include it internally...
 
 // Reference for Unicode names and values: https://unicode-table.com/en/
 // Reference for QT key enums: https://doc.qt.io/qt-5/qt.html#Key-enum
 
-const EpaperEvdevKeyboardMap::Mapping s_keymap_fr[] = {
+namespace EpaperEvdevKeyboardMap {
+namespace Locale {
+
+struct France {
+constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { 1, 0xffff, 0x01000000, 0x00, 0x00, 0x0000 },
 
     // KEY_1 (2)
@@ -932,7 +934,9 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_fr[] = {
     { KEY_CHANNELDOWN, 0xffff, Qt::Key_ChannelDown, 0x00, 0x00, 0x0000 },
 };
 
-const EpaperEvdevKeyboardMap::Composing s_keycompose_fr[] = {
+constexpr static size_t keymapSize = sizeof(keymap) / sizeof(keymap[0]);
+
+constexpr static EpaperEvdevKeyboardMap::Composing keycompose[] = {
     { 0x0060, 0x0041, 0x00c0 },
     { 0x0060, 0x0061, 0x00e0 },
     { 0x0027, 0x0041, 0x00c1 },
@@ -1082,15 +1086,14 @@ const EpaperEvdevKeyboardMap::Composing s_keycompose_fr[] = {
     { 0x0049, 0x004a, 0x0178 },
 };
 
-#include <vector>
-#include <tuple>
+constexpr static size_t keycomposeSize = sizeof(keycompose) / sizeof(keycompose[0]);
 
-using PairVectorType = std::vector<std::pair<quint16, quint16>>;
+#include <tuple>
 
 // This struct exists only for French as of now; letters à, ç, è, é and ù
 // are only printed in uppercase when caps lock is on (but not with shift).
 // Merci français, for being so special!
-PairVectorType s_capslock_exception_fr = {
+static constexpr std::pair<quint16, quint16> capsLockException[] = {
     // "é" Latin Small Letter E with Acute 0x00e9
     // "É" Latin Capital Letter E with Acute 0x00c9
     {0x00e9, 0x00c9},
@@ -1111,3 +1114,8 @@ PairVectorType s_capslock_exception_fr = {
     // "Ù" Latin Capital Letter U with Grave 0x00d9
     {0x00f9, 0x00d9},
 };
+
+};
+
+} // namespace Locale
+} // namespace EpaperEvdevKeyboardMap

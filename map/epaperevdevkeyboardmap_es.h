@@ -57,14 +57,16 @@
 #include "linux/input.h"
 #endif
 
-using namespace EpaperEvdevKeyboardMap;
-
 // no QT_BEGIN_NAMESPACE, since we include it internally...
 
 // Reference for Unicode names and values: https://unicode-table.com/en/
 // Reference for QT key enums: https://doc.qt.io/qt-5/qt.html#Key-enum
 
-const EpaperEvdevKeyboardMap::Mapping s_keymap_es[] = {
+namespace EpaperEvdevKeyboardMap {
+namespace Locale {
+
+struct Spain {
+constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { 1, 0xffff, 0x01000000, 0x00, 0x00, 0x0000 },
 
     // 1!
@@ -550,10 +552,10 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_es[] = {
     // "Ç" Latin Capital Letter C with Cedilla 0x00c7
     { KEY_APOSTROPHE, 0x0301, Qt::Key_Dead_Acute, Modifiers::ModPlain, Flags::IsDead, 0x0000 },
     { KEY_APOSTROPHE, 0x0308, Qt::Key_Dead_Diaeresis, Modifiers::ModShift, Flags::IsDead, 0x0000 },
-    { KEY_APOSTROPHE, 0x00e7, Qt::Key_Ccedilla, Modifiers::ModAltGr, 0x00, 0x0000 },
-    { KEY_APOSTROPHE, 0x00e7, Qt::Key_Ccedilla, Modifiers::ModAlt, 0x00, 0x0000 },
-    { KEY_APOSTROPHE, 0x00c7, Qt::Key_Ccedilla, Modifiers::ModShift | Modifiers::ModAltGr, 0x00, 0x0000 },
-    { KEY_APOSTROPHE, 0x00c7, Qt::Key_Ccedilla, Modifiers::ModShift | Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_APOSTROPHE, 0x00e7, Qt::Key_Ccedilla, Modifiers::ModAltGr, Flags::IsLetter, 0x0000 },
+    { KEY_APOSTROPHE, 0x00e7, Qt::Key_Ccedilla, Modifiers::ModAlt, Flags::IsLetter, 0x0000 },
+    { KEY_APOSTROPHE, 0x00c7, Qt::Key_Ccedilla, Modifiers::ModShift | Modifiers::ModAltGr, Flags::IsLetter, 0x0000 },
+    { KEY_APOSTROPHE, 0x00c7, Qt::Key_Ccedilla, Modifiers::ModShift | Modifiers::ModAlt, Flags::IsLetter, 0x0000 },
 
     // KEY_GRAVE (41)
     // "`" Combining Grave Accent 0x0300 (Dead Key)
@@ -874,7 +876,9 @@ const EpaperEvdevKeyboardMap::Mapping s_keymap_es[] = {
     { KEY_CHANNELDOWN, 0xffff, Qt::Key_ChannelDown, 0x00, 0x00, 0x0000 },
 };
 
-const EpaperEvdevKeyboardMap::Composing s_keycompose_es[] = {
+constexpr static size_t keymapSize = sizeof(keymap) / sizeof(keymap[0]);
+
+constexpr static EpaperEvdevKeyboardMap::Composing keycompose[] = {
     { 0x0060, 0x0041, 0x00c0 },
     { 0x0060, 0x0061, 0x00e0 },
     { 0x0027, 0x0041, 0x00c1 },
@@ -1023,3 +1027,9 @@ const EpaperEvdevKeyboardMap::Composing s_keycompose_es[] = {
     { 0x0069, 0x006a, 0x00ff },
     { 0x0049, 0x004a, 0x0178 },
 };
+
+constexpr static size_t keycomposeSize = sizeof(keycompose) / sizeof(keycompose[0]);
+};
+
+} // namespace Locale
+} // namespace EpaperEvdevKeyboardMap
