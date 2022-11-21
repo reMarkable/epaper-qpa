@@ -1115,8 +1115,6 @@ static constexpr std::pair<quint16, quint16> capsLockException[] = {
     {0x00f9, 0x00d9},
 };
 
-// constexpr static size_t capsLockExceptionSize = sizeof(capsLockException) / sizeof(capsLockException[0]);
-
 };
 
 } // namespace Locale
