@@ -22,6 +22,9 @@ constexpr static Mapping keymap[] = {
     // KEY_RIGHTALT (100)
     { KEY_RIGHTALT, 0xffff, Qt::Key_AltGr, 0x00, 0x04, 0x0002 },
 
+    // TODO(Cem):
+    // Home (bullet/rM) key is dropped after PVT. This line is now redundant,
+    // but can be kept until we're sure there are no EVT/DVT birds lying around.
     // KEY_HOME (102)
     { KEY_HOME, 0xffff, Qt::Key_Home, 0x00, 0x00, 0x0000 },
 
@@ -41,8 +44,11 @@ constexpr static Mapping keymap[] = {
     { KEY_LEFTALT, 0xffff, Qt::Key_Control, 0x00, 0x04, 0x0004 },
 
     // KEY_RIGHTALT (100)
-    { KEY_RIGHTALT, 0xffff, Qt::Key_Control, 0x00, 0x04, 0x0004 },
+    { KEY_RIGHTALT, 0xffff, Qt::Key_AltGr, 0x00, 0x04, 0x0002 },
 
+    // TODO(Cem):
+    // Home (bullet/rM) key is dropped after PVT. This line is now redundant,
+    // but can be kept until we're sure there are no EVT/DVT birds lying around.
     // KEY_HOME (102)
     { KEY_HOME, 0xffff, Qt::Key_AltGr, 0x00, 0x04, 0x0002 },
 
