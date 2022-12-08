@@ -69,75 +69,90 @@ struct Spain {
 constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { 1, 0xffff, 0x01000000, 0x00, 0x00, 0x0000 },
 
-    // 1!
-    //"1" DIGIT ONE        Basic Latin 0x0031 0x3100
-    //"!" EXCLAMATION MARK Basic Latin 0x0021 0x2100
-    { KEY_1, 0x0031, 0x00000031, 0x00, 0x00, 0x0000 },
-    { KEY_1, 0x0021, 0x00000021, Modifiers::ModShift, 0x00, 0x0000 },
-    
+    // KEY_1 (2)
+    // "1" Digit One 0x0031
+    // "!" Exclamation Mark 0x0021
+    { KEY_1, 0x0031, Qt::Key_1, 0x00, 0x00, 0x0000 },
+    { KEY_1, 0x0021, Qt::Key_Exclam, Modifiers::ModShift, 0x00, 0x0000 },
 
-    // 2"@
-    //"2"  DIGIT TWO      Basic Latin 0x0032 0x3200
-    //"""  QUOTATION MARK Basic Latin 0x0022 0x2200
-    //"@"  COMMERCIAL AT  Basic Latin 0x0040 0x4000
-    { KEY_2, 0x0032, 0x00000032, 0x00, 0x00, 0x0000 },
-    { KEY_2, 0x0022, 0x00000022, Modifiers::ModShift, 0x00, 0x0000 },
-    { KEY_2, 0x0040, 0x00000040, Modifiers::ModAlt, 0x00, 0x0000 },
-    { KEY_2, 0x0040, 0x00000040, Modifiers::ModAltGr, 0x00, 0x0000 },
+    // KEY_2 (3)
+    // "2" Digit Two 0x0032
+    // """ Quotation Mark 0x0022
+    // "@" Commercial At 0x0040
+    { KEY_2, 0x0032, Qt::Key_2, 0x00, 0x00, 0x0000 },
+    { KEY_2, 0x0022, Qt::Key_QuoteDbl, Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_2, 0x0040, Qt::Key_At, Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_2, 0x0040, Qt::Key_At, Modifiers::ModAltGr, 0x00, 0x0000 },
+    { KEY_2, 0x0040, Qt::Key_At, Modifiers::ModShift | Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_2, 0x0040, Qt::Key_At, Modifiers::ModShift | Modifiers::ModAltGr, 0x00, 0x0000 },
 
-    // 3#·
-    //"3"  DIGIT THREE Basic Latin        0x0033 0x3300
-    //"#"  NUMBER SIGN Basic Latin        0x0023 0x2300
-    //"·"  MIDDLE DOT  Latin-1 Supplement 0x00B7 0xB700
-    { KEY_3, 0x0033, 0x00000033, 0x00, 0x00, 0x0000 },
-    { KEY_3, 0x0023, 0x00000023, Modifiers::ModShift, 0x00, 0x0000 },
-    { KEY_3, 0x00B7, 0x000000B7, Modifiers::ModAlt, 0x00, 0x0000 },
-    { KEY_3, 0x00B7, 0x000000B7, Modifiers::ModAltGr, 0x00, 0x0000 },
+    // KEY_3 (4)
+    // "3" Digit Three 0x0033
+    // "·"  Middle Dot 0xB700
+    // "#" Number Sign 0x0023
+    { KEY_3, 0x0033, Qt::Key_3, 0x00, 0x00, 0x0000 },
+    { KEY_3, 0x00B7, Qt::Key_periodcentered, Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_3, 0x0023, Qt::Key_NumberSign, Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_3, 0x0023, Qt::Key_NumberSign, Modifiers::ModAltGr, 0x00, 0x0000 },
+    { KEY_3, 0x0023, Qt::Key_NumberSign, Modifiers::ModShift | Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_3, 0x0023, Qt::Key_NumberSign, Modifiers::ModShift | Modifiers::ModAltGr, 0x00, 0x0000 },
 
-    // 4$~
-    //"4"  DIGIT FOUR  Basic Latin 0x0034 0x3400
-    //"$"  DOLLAR SIGN Basic Latin 0x0024 0x2400
+    // KEY_4 (5)
+    // "4" Digit Four 0x0034
+    // "$" Dollar Sign 0x0024
     // "̃ " Combining Tilde 0x0303
-    { KEY_4, 0x0034, 0x00000034, 0x00, 0x00, 0x0000 },
-    { KEY_4, 0x0024, 0x00000024, Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_4, 0x0034, Qt::Key_4, 0x00, 0x00, 0x0000 },
+    { KEY_4, 0x0024, Qt::Key_Dollar, Modifiers::ModShift, 0x00, 0x0000 },
     { KEY_4, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAlt, Flags::IsDead, 0x0000 },
     { KEY_4, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
+    { KEY_4, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModShift | Modifiers::ModAlt, Flags::IsDead, 0x0000 },
+    { KEY_4, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModShift | Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
 
-    // 5%
-    //"5" DIGIT FIVE   Basic Latin 0x0035 0x3500
-    //"%" PERCENT SIGN Basic Latin 0x0025 0x2500
-    { KEY_5, 0x0035, 0x00000035, 0x00, 0x00, 0x0000 },
-    { KEY_5, 0x0025, 0x00000025, Modifiers::ModShift, 0x00, 0x0000 },
+    // KEY_5 (6)
+    // "5" Digit Five 0x0035
+    // "%" Percent Sign 0x0025
+    { KEY_5, 0x0035, Qt::Key_5, 0x00, 0x00, 0x0000 },
+    { KEY_5, 0x0025, Qt::Key_Percent, Modifiers::ModShift, 0x00, 0x0000 },
 
-    // 6&
-    //"5" DIGIT SIX Basic Latin 0x0036 0x3600
-    //"&" AMPERSAND Basic Latin 0x0026 0x2600
-    { KEY_6, 0x0036, 0x00000036, 0x00, 0x00, 0x0000 },
-    { KEY_6, 0x0026, 0x00000026, Modifiers::ModShift, 0x00, 0x0000 },
+    // KEY_6 (7)
+    // "6" Digit Six 0x0036
+    // "&" Ampersand 0x0026
+    { KEY_6, 0x0036, Qt::Key_6, 0x00, 0x00, 0x0000 },
+    { KEY_6, 0x0026, Qt::Key_Ampersand, Modifiers::ModShift, 0x00, 0x0000 },
 
-    // 7/
-    //"7" DIGIT SEVEN Basic Latin 0x0037 0x3700
-    //"/" SOLIDUS     Basic Latin 0x002F 0x2F00
-    { KEY_7, 0x0037, 0x00000037, 0x00, 0x00, 0x0000 },
-    { KEY_7, 0x002F, 0x0000002F, Modifiers::ModShift, 0x00, 0x0000 },
+    // KEY_7 (8)
+    // "7" Digit Seven 0x0037
+    // "/" Solidus 0x002f
+    { KEY_7, 0x0037, Qt::Key_7, 0x00, 0x00, 0x0000 },
+    { KEY_7, 0x002F, Qt::Key_Slash, Modifiers::ModShift, 0x00, 0x0000 },
 
-    // 8(
-    //"8" DIGIT EIGHT      Basic Latin 0x0038 0x3800
-    //"(" LEFT PARENTHESIS Basic Latin 0x0028 0x2800
-    { KEY_8, 0x0038, 0x00000038, 0x00, 0x00, 0x0000 },
-    { KEY_8, 0x0028, 0x00000028, Modifiers::ModShift, 0x00, 0x0000 },
+    // KEY_8 (9)
+    // "8" Digit Eight 0x0038
+    // "(" Left Parenthesis 0x0028
+    { KEY_8, 0x0038, Qt::Key_8, 0x00, 0x00, 0x0000 },
+    { KEY_8, 0x0028, Qt::Key_ParenLeft, Modifiers::ModShift, 0x00, 0x0000 },
 
-    // 9)
-    //"9" DIGIT NINE        Basic Latin 0x0039 0x3900
-    //")" RIGHT PARENTHESIS Basic Latin 0x0029 0x2900
-    { KEY_9, 0x0039, 0x00000039, 0x00, 0x00, 0x0000 },
-    { KEY_9, 0x0029, 0x00000029, Modifiers::ModShift, 0x00, 0x0000 },
+    // KEY_9 (10)
+    // "9" Digit Nine 0x0039
+    // ")" Right Parenthesis 0x0029
+    // "^" Combining Circumflex Accent 0x0302
+    { KEY_9, 0x0039, Qt::Key_9, 0x00, 0x00, 0x0000 },
+    { KEY_9, 0x0029, Qt::Key_ParenRight, Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_9, 0x0302, Qt::Key_Dead_Circumflex, Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
+    { KEY_9, 0x0302, Qt::Key_Dead_Circumflex, Modifiers::ModAlt, Flags::IsDead, 0x0000 },
+    { KEY_9, 0x0302, Qt::Key_Dead_Circumflex, Modifiers::ModShift | Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
+    { KEY_9, 0x0302, Qt::Key_Dead_Circumflex, Modifiers::ModShift | Modifiers::ModAlt, Flags::IsDead, 0x0000 },
 
-    // 0=
-    //"0" DIGIT ZERO  Basic Latin 0x0030 0x3000
-    //"=" EQUALS SIGN Basic Latin 0x003D 0x3D00
-    { KEY_0, 0x0030, 0x00000030, 0x00, 0x00, 0x0000 },
-    { KEY_0, 0x003D, 0x0000003D, Modifiers::ModShift, 0x00, 0x0000 },
+    // KEY_0 (11)
+    // "0" Digit Zero 0x0030
+    // "=" Equals Sign 0x003d
+    // "?" Question Mark 0x003f
+    { KEY_0, 0x0030, Qt::Key_0, 0x00, 0x00, 0x0000 },
+    { KEY_0, 0x003D, Qt::Key_Equal, Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_0, 0x003F, Qt::Key_Question, Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_0, 0x003F, Qt::Key_Question, Modifiers::ModAltGr, 0x00, 0x0000 },
+    { KEY_0, 0x003F, Qt::Key_Question, Modifiers::ModShift | Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_0, 0x003F, Qt::Key_Question, Modifiers::ModShift | Modifiers::ModAltGr, 0x00, 0x0000 },
 
     // Keycode 12 non-existent on Seabird.
     { 12, 0x002D, 0x0000002D, 0x00, 0x00, 0x0000 },
@@ -146,17 +161,16 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { 12, 0x005F, 0x0400005F, 0x04, 0x00, 0x0000 },
     { 12, 0x005F, 0x0400005F, 0x05, 0x00, 0x0000 },
 
-    /* "'" APOSTROPHE                 Basic Latin        0x0027 0x2700 */
-    /* "?" QUESTION MARK              Basic Latin        0x003F 0x3F00 */
-    /* "¡" INVERTED EXCLAMATION MARK  Latin-1 Supplement 0x00A1 0xA100 */
-    /* "¿" INVERTED QUESTION MARK     Latin-1 Supplement 0x00BF 0xBF00 */
-
+    // KEY_EQUAL (13)
+    // "'" Apostrophe 0x0027
+    // "¡" Inverted Exclamation Mark 0x00A1
+    // "¿" Inverted Question Mark 0x00BF
     { KEY_EQUAL, 0x0027, Qt::Key_Apostrophe, 0x00, 0x00, 0x0000 },
-    { KEY_EQUAL, 0x003F, Qt::Key_Question, Modifiers::ModShift, 0x00, 0x0000 },
-    { KEY_EQUAL, 0x00A1, Qt::Key_exclamdown, Modifiers::ModAlt, 0x00, 0x0000 },
-    { KEY_EQUAL, 0x00A1, Qt::Key_exclamdown, Modifiers::ModAltGr, 0x00, 0x0000 },
-    { KEY_EQUAL, 0x00BF, Qt::Key_questiondown, Modifiers::ModAlt | Modifiers::ModShift, 0x00, 0x0000 },
-    { KEY_EQUAL, 0x00BF, Qt::Key_questiondown, Modifiers::ModAltGr | Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_EQUAL, 0x00A1, Qt::Key_exclamdown, Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_EQUAL, 0x00BF, Qt::Key_questiondown, Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_EQUAL, 0x00BF, Qt::Key_questiondown, Modifiers::ModAltGr, 0x00, 0x0000 },
+    { KEY_EQUAL, 0x00BF, Qt::Key_questiondown, Modifiers::ModShift | Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_EQUAL, 0x00BF, Qt::Key_questiondown, Modifiers::ModShift | Modifiers::ModAltGr, 0x00, 0x0000 },
 
     // KEY_BACKSPACE (14)
     { KEY_BACKSPACE, 0xffff, Qt::Key_Backspace, 0x00, 0x00, 0x0000 },
@@ -219,7 +233,7 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { KEY_E, 0x20ac, 0x0c000045, 0x0d, 0x02, 0x0000 },
     { KEY_E, 0x20ac, 0x0c000045, 0x0e, 0x02, 0x0000 },
     { KEY_E, 0x20ac, 0x0c000045, 0x0f, 0x02, 0x0000 },
-    
+
     // KEY_R (19)
     { KEY_R, 0x0072, 0x00000052, 0x00, 0x02, 0x0000 },
     { KEY_R, 0x0052, 0x00000052, 0x01, 0x02, 0x0000 },
@@ -237,7 +251,7 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { KEY_R, 0x0072, 0x0c000052, 0x0d, 0x02, 0x0000 },
     { KEY_R, 0x0072, 0x0c000052, 0x0e, 0x02, 0x0000 },
     { KEY_R, 0x0072, 0x0c000052, 0x0f, 0x02, 0x0000 },
-    
+
     // KEY_T (20)
     { KEY_T, 0x0074, 0x00000054, 0x00, 0x02, 0x0000 },
     { KEY_T, 0x0054, 0x00000054, 0x01, 0x02, 0x0000 },
@@ -255,7 +269,7 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { KEY_T, 0x0074, 0x0c000054, 0x0d, 0x02, 0x0000 },
     { KEY_T, 0x0074, 0x0c000054, 0x0e, 0x02, 0x0000 },
     { KEY_T, 0x0074, 0x0c000054, 0x0f, 0x02, 0x0000 },
-    
+
     // KEY_Y (21)
     { KEY_Y, 0x0079, 0x00000059, 0x00, 0x02, 0x0000 },
     { KEY_Y, 0x0059, 0x00000059, 0x01, 0x02, 0x0000 },
@@ -273,7 +287,7 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { KEY_Y, 0x0079, 0x0c000059, 0x0d, 0x02, 0x0000 },
     { KEY_Y, 0x0079, 0x0c000059, 0x0e, 0x02, 0x0000 },
     { KEY_Y, 0x0079, 0x0c000059, 0x0f, 0x02, 0x0000 },
-    
+
     // KEY_U (22)
     { KEY_U, 0x0075, 0x00000055, 0x00, 0x02, 0x0000 },
     { KEY_U, 0x0055, 0x00000055, 0x01, 0x02, 0x0000 },
@@ -291,7 +305,7 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { KEY_U, 0x0075, 0x0c000055, 0x0d, 0x02, 0x0000 },
     { KEY_U, 0x0075, 0x0c000055, 0x0e, 0x02, 0x0000 },
     { KEY_U, 0x0075, 0x0c000055, 0x0f, 0x02, 0x0000 },
-    
+
     // KEY_I (23)
     { KEY_I, 0x0069, 0x00000049, 0x00, 0x02, 0x0000 },
     { KEY_I, 0x0049, 0x00000049, 0x01, 0x02, 0x0000 },
@@ -309,26 +323,16 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { KEY_I, 0x0069, 0x0c000049, 0x0d, 0x02, 0x0000 },
     { KEY_I, 0x0069, 0x0c000049, 0x0e, 0x02, 0x0000 },
     { KEY_I, 0x0069, 0x0c000049, 0x0f, 0x02, 0x0000 },
-    
+
     // KEY_O (24)
     // "º" Masculine Ordinal Indicator 0x00ba
     { KEY_O, 0x006f, 0x0000004f, 0x00, 0x02, 0x0000 },
     { KEY_O, 0x004f, 0x0000004f, 0x01, 0x02, 0x0000 },
-    { KEY_O, 0x00ba, 0x0000004f, 0x02, 0x02, 0x0000 },
-    { KEY_O, 0x00ba, 0x0000004f, 0x03, 0x02, 0x0000 },
-    { KEY_O, 0x00ba, 0x0400004f, 0x04, 0x02, 0x0000 },
-    { KEY_O, 0x00ba, 0x0400004f, 0x05, 0x02, 0x0000 },
-    { KEY_O, 0x00ba, 0x0400004f, 0x06, 0x02, 0x0000 },
-    { KEY_O, 0x00ba, 0x0400004f, 0x07, 0x02, 0x0000 },
-    { KEY_O, 0x00ba, 0x0800004f, 0x08, 0x02, 0x0000 },
-    { KEY_O, 0x00ba, 0x0800004f, 0x09, 0x02, 0x0000 },
-    { KEY_O, 0x00ba, 0x0800004f, 0x0a, 0x02, 0x0000 },
-    { KEY_O, 0x00ba, 0x0800004f, 0x0b, 0x02, 0x0000 },
-    { KEY_O, 0x00ba, 0x0c00004f, 0x0c, 0x02, 0x0000 },
-    { KEY_O, 0x00ba, 0x0c00004f, 0x0d, 0x02, 0x0000 },
-    { KEY_O, 0x00ba, 0x0c00004f, 0x0e, 0x02, 0x0000 },
-    { KEY_O, 0x00ba, 0x0c00004f, 0x0f, 0x02, 0x0000 },
-    
+    { KEY_O, 0x00ba, Qt::Key_masculine, Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_O, 0x00ba, Qt::Key_masculine, Modifiers::ModAltGr, 0x00, 0x0000 },
+    { KEY_O, 0x00ba, Qt::Key_masculine, Modifiers::ModShift | Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_O, 0x00ba, Qt::Key_masculine, Modifiers::ModShift | Modifiers::ModAltGr, 0x00, 0x0000 },
+
     // KEY_P (25)
     { KEY_P, 0x0070, 0x00000050, 0x00, 0x02, 0x0000 },
     { KEY_P, 0x0050, 0x00000050, 0x01, 0x02, 0x0000 },
@@ -361,25 +365,15 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
 
     // KEY_LEFTCTRL (29)
     { KEY_LEFTCTRL, 0xffff, 0x01000021, 0x00, 0x04, 0x0004 }, // 0x04 => Flags::IsModifier, 0x0004 => Modifiers::ModControl, so apply ModControl when KEY_LEFTCTRL is pressed?
-    
+
     // KEY_A (30)
     // "ª" Feminine Ordinal Indicator 0x00aa
     { KEY_A, 0x0061, 0x00000041, 0x00, 0x02, 0x0000 },
     { KEY_A, 0x0041, 0x00000041, 0x01, 0x02, 0x0000 },
-    { KEY_A, 0x00aa, 0x00000041, 0x02, 0x02, 0x0000 },
-    { KEY_A, 0x00aa, 0x00000041, 0x03, 0x02, 0x0000 },
-    { KEY_A, 0x00aa, 0x04000041, 0x04, 0x02, 0x0000 },
-    { KEY_A, 0x00aa, 0x04000041, 0x05, 0x02, 0x0000 },
-    { KEY_A, 0x00aa, 0x04000041, 0x06, 0x02, 0x0000 },
-    { KEY_A, 0x00aa, 0x04000041, 0x07, 0x02, 0x0000 },
-    { KEY_A, 0x00aa, 0x08000041, 0x08, 0x02, 0x0000 },
-    { KEY_A, 0x00aa, 0x08000041, 0x09, 0x02, 0x0000 },
-    { KEY_A, 0x00aa, 0x08000041, 0x0a, 0x02, 0x0000 },
-    { KEY_A, 0x00aa, 0x08000041, 0x0b, 0x02, 0x0000 },
-    { KEY_A, 0x00aa, 0x0c000041, 0x0c, 0x02, 0x0000 },
-    { KEY_A, 0x00aa, 0x0c000041, 0x0d, 0x02, 0x0000 },
-    { KEY_A, 0x00aa, 0x0c000041, 0x0e, 0x02, 0x0000 },
-    { KEY_A, 0x00aa, 0x0c000041, 0x0f, 0x02, 0x0000 },
+    { KEY_A, 0x00aa, Qt::Key_ordfeminine, Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_A, 0x00aa, Qt::Key_ordfeminine, Modifiers::ModAltGr, 0x00, 0x0000 },
+    { KEY_A, 0x00aa, Qt::Key_ordfeminine, Modifiers::ModShift | Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_A, 0x00aa, Qt::Key_ordfeminine, Modifiers::ModShift | Modifiers::ModAltGr, 0x00, 0x0000 },
 
     // KEY_S (31)
     { KEY_S, 0x0073, 0x00000053, 0x00, 0x02, 0x0000 },
@@ -559,14 +553,12 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
 
     // KEY_GRAVE (41)
     // "`" Combining Grave Accent 0x0300 (Dead Key)
-    // "^" Combining Circumflex Accent 0x0302 (Dead Key)
     // "+" Plus Sign 0x002b
     // "*" Asterisk 0x002a
     { KEY_GRAVE, 0x0300, Qt::Key_Dead_Grave, Modifiers::ModPlain, Flags::IsDead, 0x0000 },
-    // TODO: Circumflex + whitspace composes a superscript 2. Could not find this combo among compose map, possibly some bug?
-    { KEY_GRAVE, 0x0302, Qt::Key_Dead_Circumflex, Modifiers::ModShift, Flags::IsDead, 0x0000 },
-    { KEY_GRAVE, 0x002b, Qt::Key_Plus, Modifiers::ModAlt, 0x00, 0x0000 },
-    { KEY_GRAVE, 0x002b, Qt::Key_Plus, Modifiers::ModAltGr, 0x00, 0x0000 },
+    { KEY_GRAVE, 0x002b, Qt::Key_Plus, Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_GRAVE, 0x002a, Qt::Key_Asterisk, Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_GRAVE, 0x002a, Qt::Key_Asterisk, Modifiers::ModAltGr, 0x00, 0x0000 },
     { KEY_GRAVE, 0x002a, Qt::Key_Asterisk, Modifiers::ModAlt | Modifiers::ModShift, 0x00, 0x0000 },
     { KEY_GRAVE, 0x002a, Qt::Key_Asterisk, Modifiers::ModAltGr | Modifiers::ModShift, 0x00, 0x0000 },
 
@@ -812,7 +804,7 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     // Non-existent
     { 98, 0x002f, 0x2000002f, 0x00, 0x00, 0x0000 },
     { 99, 0x005c, 0x0400005c, 0x00, 0x00, 0x0000 },
-    
+
     // KEY_RIGHTALT (100)
     { KEY_RIGHTALT, 0xffff, 0x01001103, 0x00, 0x04, 0x0002 },
 

@@ -116,7 +116,7 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
 
     // KEY_8 (9)
     // "8" Digit Eight 0x0038
-    // "(" Left Parenthesis 0x0028    
+    // "(" Left Parenthesis 0x0028
     { KEY_8, 0x0038, Qt::Key_8, 0x00, 0x00, 0x0000 },
     { KEY_8, 0x0028, Qt::Key_ParenLeft, Modifiers::ModShift, 0x00, 0x0000 },
 
@@ -129,8 +129,13 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     // KEY_0 (11)
     // "0" Digit Zero 0x0030
     // "=" Equals Sign 0x003d
+    // "`" Grave Accent 0x0060
     { KEY_0, 0x0030, Qt::Key_0, 0x00, 0x00, 0x0000 },
     { KEY_0, 0x003d, Qt::Key_Equal, Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_0, 0x0060, Qt::Key_Dead_Grave, Modifiers::ModAlt, Flags::IsDead, 0x0000 },
+    { KEY_0, 0x0060, Qt::Key_Dead_Grave, Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
+    { KEY_0, 0x0060, Qt::Key_Dead_Grave, Modifiers::ModShift | Modifiers::ModAlt, Flags::IsDead, 0x0000 },
+    { KEY_0, 0x0060, Qt::Key_Dead_Grave, Modifiers::ModShift | Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
 
     // Keycode 12 non-existent on Seabird.
     { 12, 0x002D, 0x0000002D, 0x00, 0x00, 0x0000 },
@@ -143,13 +148,12 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     // "ß" Latin Small Letter Sharp S 0x00df
     // "?" Question Mark 0x003f
     // "´" Acute Accent 0x00b4
-    // "`" Grave Accent 0x0060
     { KEY_EQUAL, 0x00df, Qt::Key_ssharp, 0x00, 0x00, 0x0000 },
     { KEY_EQUAL, 0x003f, Qt::Key_Question, Modifiers::ModShift, 0x00, 0x0000 },
     { KEY_EQUAL, 0x00b4, Qt::Key_Dead_Acute, Modifiers::ModAlt, Flags::IsDead, 0x0000 },
     { KEY_EQUAL, 0x00b4, Qt::Key_Dead_Acute, Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
-    { KEY_EQUAL, 0x0060, Qt::Key_Dead_Grave, Modifiers::ModShift | Modifiers::ModAlt, Flags::IsDead, 0x0000 },
-    { KEY_EQUAL, 0x0060, Qt::Key_Dead_Grave, Modifiers::ModShift | Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
+    { KEY_EQUAL, 0x00b4, Qt::Key_Dead_Acute, Modifiers::ModShift | Modifiers::ModAlt, Flags::IsDead, 0x0000 },
+    { KEY_EQUAL, 0x00b4, Qt::Key_Dead_Acute, Modifiers::ModShift | Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
 
     // KEY_BACKSPACE (14)
     { KEY_BACKSPACE, 0xffff, Qt::Key_Backspace, 0x00, 0x00, 0x0000 },
@@ -325,22 +329,13 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { KEY_O, 0x004f, 0x0c00004f, 0x0f, 0x02, 0x0000 },
 
     // KEY_P (25)
+    // "*" Asterisk 0x002a
     { KEY_P, 0x0070, 0x00000050, 0x00, 0x02, 0x0000 },
-    { KEY_P, 0x0050, 0x00000050, 0x01, 0x02, 0x0000 },
-    { KEY_P, 0x0070, 0x00000050, 0x02, 0x02, 0x0000 },
-    { KEY_P, 0x0050, 0x00000050, 0x03, 0x02, 0x0000 },
-    { KEY_P, 0x0070, 0x04000050, 0x04, 0x02, 0x0000 },
-    { KEY_P, 0x0050, 0x04000050, 0x05, 0x02, 0x0000 },
-    { KEY_P, 0x0070, 0x04000050, 0x06, 0x02, 0x0000 },
-    { KEY_P, 0x0050, 0x04000050, 0x07, 0x02, 0x0000 },
-    { KEY_P, 0x0070, 0x08000050, 0x08, 0x02, 0x0000 },
-    { KEY_P, 0x0050, 0x08000050, 0x09, 0x02, 0x0000 },
-    { KEY_P, 0x0070, 0x08000050, 0x0a, 0x02, 0x0000 },
-    { KEY_P, 0x0050, 0x08000050, 0x0b, 0x02, 0x0000 },
-    { KEY_P, 0x0070, 0x0c000050, 0x0c, 0x02, 0x0000 },
-    { KEY_P, 0x0050, 0x0c000050, 0x0d, 0x02, 0x0000 },
-    { KEY_P, 0x0070, 0x0c000050, 0x0e, 0x02, 0x0000 },
-    { KEY_P, 0x0050, 0x0c000050, 0x0f, 0x02, 0x0000 },
+    { KEY_P, 0x0050, 0x00000050, Modifiers::ModShift, 0x02, 0x0000 },
+    { KEY_P, 0x002a, Qt::Key_Asterisk, Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_P, 0x002a, Qt::Key_Asterisk, Modifiers::ModAltGr, 0x00, 0x0000 },
+    { KEY_P, 0x002a, Qt::Key_Asterisk, Modifiers::ModAlt | Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_P, 0x002a, Qt::Key_Asterisk, Modifiers::ModAltGr | Modifiers::ModShift, 0x00, 0x0000 },
 
     // Non-existent (26, 27)
     { KEY_LEFTBRACE, 0x005b, 0x0000005b, 0x00, 0x00, 0x0000 },
@@ -559,18 +554,17 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { KEY_APOSTROPHE, 0x0027, Qt::Key_Apostrophe, 0x0d, 0x00, 0x0000 },
     { KEY_APOSTROPHE, 0x0027, Qt::Key_Apostrophe, 0x0e, 0x00, 0x0000 },
     { KEY_APOSTROPHE, 0x0027, Qt::Key_Apostrophe, 0x0f, 0x00, 0x0000 },
-    
+
     // KEY_GRAVE (41)
     // "ü" Latin Small Letter U with Diaeresis 0x00fc
     // "Ü" Latin Capital Letter U with Diaeresis 0x00dc
     // "+" Plus Sign 0x002b
-    // "*" Asterisk 0x002a
     { KEY_GRAVE, 0x00fc, Qt::Key_Udiaeresis, 0x00, Flags::IsLetter, 0x0000 },
     { KEY_GRAVE, 0x00dc, Qt::Key_Udiaeresis, Modifiers::ModShift, Flags::IsLetter, 0x0000 },
     { KEY_GRAVE, 0x002b, Qt::Key_Plus, Modifiers::ModAlt, 0x00, 0x0000 },
     { KEY_GRAVE, 0x002b, Qt::Key_Plus, Modifiers::ModAltGr, 0x00, 0x0000 },
-    { KEY_GRAVE, 0x002a, Qt::Key_Asterisk, Modifiers::ModAlt | Modifiers::ModShift, 0x00, 0x0000 },
-    { KEY_GRAVE, 0x002a, Qt::Key_Asterisk, Modifiers::ModAltGr | Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_GRAVE, 0x002b, Qt::Key_Plus, Modifiers::ModShift | Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_GRAVE, 0x002b, Qt::Key_Plus, Modifiers::ModShift | Modifiers::ModAltGr, 0x00, 0x0000 },
 
     { KEY_LEFTSHIFT, 0xffff, 0x01000020, 0x00, 0x04, 0x0001 },
 
