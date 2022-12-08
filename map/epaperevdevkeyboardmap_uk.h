@@ -71,7 +71,7 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
 
     // KEY_1 (2)
     // "1" Digit One 0x0031
-    // "!" Exclamation Mark 0x0021    
+    // "!" Exclamation Mark 0x0021
     { KEY_1, 0x0031, Qt::Key_1, 0x00, 0x00, 0x0000 },
     { KEY_1, 0x0021, Qt::Key_Exclam, Modifiers::ModShift, 0x00, 0x0000 },
 
@@ -128,14 +128,24 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     // KEY_9 (10)
     // "9" Digit Nine 0x0039
     // "(" Left Parenthesis 0x0028
+    // "̃ " Combining Tilde 0x0303
     { KEY_9, 0x0039, Qt::Key_9, 0x00, 0x02, 0x0000 },
     { KEY_9, 0x0028, Qt::Key_ParenLeft, Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_9, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAlt, Flags::IsDead, 0x0000 },
+    { KEY_9, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
+    { KEY_9, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModShift | Modifiers::ModAlt, Flags::IsDead, 0x0000 },
+    { KEY_9, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModShift | Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
 
     // KEY_0 (11)
     // "0" Digit Zero 0x0030
     // ")" Right Parenthesis 0x0029
+    // "+" Plus Sign 0x002b
     { KEY_0, 0x0030, Qt::Key_0, 0x00, 0x00, 0x0000 },
     { KEY_0, 0x0029, Qt::Key_ParenRight, Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_0, 0x002b, Qt::Key_Plus, Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_0, 0x002b, Qt::Key_Plus, Modifiers::ModAltGr, 0x00, 0x0000 },
+    { KEY_0, 0x002b, Qt::Key_Plus, Modifiers::ModShift | Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_0, 0x002b, Qt::Key_Plus, Modifiers::ModShift | Modifiers::ModAltGr, 0x00, 0x0000 },
 
     // Keycode 12 non-existent on Seabird.
     { 12, 0x002D, 0x0000002D, 0x00, 0x00, 0x0000 },
@@ -148,13 +158,12 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     // "-" Hyphen-Minus 0x002d
     // "_" Low Line 0x005f
     // "=" Equals Sign 0x003d
-    // "+" Plus Sign 0x002b
     { KEY_EQUAL, 0x002d, Qt::Key_Minus, 0x00, 0x00, 0x0000 },
     { KEY_EQUAL, 0x005f, Qt::Key_Underscore, Modifiers::ModShift, 0x00, 0x0000 },
     { KEY_EQUAL, 0x003d, Qt::Key_Equal, Modifiers::ModAlt, 0x00, 0x0000 },
     { KEY_EQUAL, 0x003d, Qt::Key_Equal, Modifiers::ModAltGr, 0x00, 0x0000 },
-    { KEY_EQUAL, 0x002b, Qt::Key_Plus, Modifiers::ModShift | Modifiers::ModAlt, 0x00, 0x0000 },
-    { KEY_EQUAL, 0x002b, Qt::Key_Plus, Modifiers::ModShift | Modifiers::ModAltGr, 0x00, 0x0000 },
+    { KEY_EQUAL, 0x003d, Qt::Key_Equal, Modifiers::ModShift | Modifiers::ModAlt, 0x00, 0x0000 },
+    { KEY_EQUAL, 0x003d, Qt::Key_Equal, Modifiers::ModShift | Modifiers::ModAltGr, 0x00, 0x0000 },
 
     // KEY_BACKSPACE (14)
     { KEY_BACKSPACE, 0xffff, Qt::Key_Backspace, 0x00, 0x00, 0x0000 },
@@ -550,15 +559,12 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     // "`" Grave Accent 0x0060
     // "´" Acute Accent 0x00b4
     // "¨" Combining Diaeresis 0x0308
-    // "̃ " Combining Tilde 0x0303
     { KEY_GRAVE, 0x0060, Qt::Key_Dead_Grave, 0x00, Flags::IsDead, 0x0000 },
     { KEY_GRAVE, 0x00b4, Qt::Key_Dead_Acute, Modifiers::ModShift, Flags::IsDead, 0x0000 },
     { KEY_GRAVE, 0x0308, Qt::Key_Dead_Diaeresis, Modifiers::ModAlt, Flags::IsDead, 0x0000 },
     { KEY_GRAVE, 0x0308, Qt::Key_Dead_Diaeresis, Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
-    { KEY_GRAVE, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAlt, Flags::IsDead, 0x0000 },
-    { KEY_GRAVE, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
-    { KEY_GRAVE, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAlt | Modifiers::ModShift, Flags::IsDead, 0x0000 },
-    { KEY_GRAVE, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAltGr | Modifiers::ModShift, Flags::IsDead, 0x0000 },
+    { KEY_GRAVE, 0x0308, Qt::Key_Dead_Diaeresis, Modifiers::ModShift | Modifiers::ModAlt, Flags::IsDead, 0x0000 },
+    { KEY_GRAVE, 0x0308, Qt::Key_Dead_Diaeresis, Modifiers::ModShift | Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
 
     { KEY_LEFTSHIFT, 0xffff, 0x01000020, 0x00, 0x04, 0x0001 },
 
