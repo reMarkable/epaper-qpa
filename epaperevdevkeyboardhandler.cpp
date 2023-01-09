@@ -334,6 +334,35 @@ void EpaperEvdevKeyboardHandler::processKeyEvent(int nativecode, int unicode, in
 
 EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKeycode(quint16 keycode, bool pressed, bool autorepeat)
 {
+    switch (m_flavor) {
+    case EpaperEvdevKeyboardMap::InputFlavor::Windows:
+        // No changes needed in this flavor
+        break;
+    case EpaperEvdevKeyboardMap::InputFlavor::Apple:
+        switch (keycode) {
+        case KEY_LEFTCTRL:
+            keycode = KEY_END;
+            break;
+        case KEY_LEFTALT:
+            keycode = KEY_LEFTCTRL;
+            break;
+        case KEY_RIGHTALT:
+            keycode = KEY_RIGHTALT;
+            break;
+        case KEY_HOME:
+            // TODO(Cem):
+            // Home (bullet/rM) key is dropped after PVT. This line is now redundant,
+            // but can be kept until we're sure there are no EVT/DVT birds lying around.
+            // KEY_HOME (102)
+            keycode = KEY_RIGHTALT;
+            break;
+        case KEY_END:
+            keycode = KEY_RIGHTALT;
+            break;
+        }
+        break;
+    }
+
     KeycodeAction result = None;
     bool first_press = pressed && !autorepeat;
 
@@ -588,7 +617,6 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
 }
 
 // builtin keymaps
-#include "map/epaperevdevkeyboardmap_flavor.h"
 #include "map/epaperevdevkeyboardmap_no.h"
 #include "map/epaperevdevkeyboardmap_us_rm.h"
 #include "map/epaperevdevkeyboardmap_es.h"
@@ -789,21 +817,11 @@ void EpaperEvdevKeyboardHandler::populateKeymap() {
     delete[] m_keymap;
     m_keymap = nullptr;
 
-    using namespace EpaperEvdevKeyboardMap::Flavor;
-    auto const flavorMapSize = (m_flavor == EpaperEvdevKeyboardMap::InputFlavor::Windows ?
-        Windows::keymapSize :
-        Apple::keymapSize);
-
-    auto const& flavorMap = (m_flavor == EpaperEvdevKeyboardMap::InputFlavor::Windows ?
-        Windows::keymap :
-        Apple::keymap);
-
-    m_keymap_size = LocaleType::keymapSize + flavorMapSize;
+    m_keymap_size = LocaleType::keymapSize;
     m_keymap = new EpaperEvdevKeyboardMap::Mapping[m_keymap_size];
 
-    // Populate m_keymap with contents of locale map and flavor map, concatanated.
-    auto endIter = std::copy(LocaleType::keymap, LocaleType::keymap + LocaleType::keymapSize, m_keymap);
-    std::copy(flavorMap, flavorMap + flavorMapSize, endIter);
+    // Populate m_keymap with contents of locale map.
+    std::copy(LocaleType::keymap, LocaleType::keymap + LocaleType::keymapSize, m_keymap);
 
     m_keycompose_size = LocaleType::keycomposeSize;
     m_keycompose = LocaleType::keycompose;
