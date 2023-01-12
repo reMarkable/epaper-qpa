@@ -74,7 +74,7 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     // "1" Digit One 0x0031
     { KEY_1, 0x0026, Qt::Key_Ampersand, 0x00, 0x00, 0x0000 },
     { KEY_1, 0x0031, Qt::Key_1, Modifiers::ModShift, 0x00, 0x0000 },
-
+    { KEY_1, 0x0031, Qt::Key_1 | 0x04000000, Modifiers::ModControl, 0x00, 0x0000 },
 
     // KEY_2 (3)
     // "é" Latin Small Letter E with Acute 0x00e9
@@ -84,6 +84,7 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { KEY_2, 0x0032, Qt::Key_2, Modifiers::ModShift, 0x00, 0x0000 },
     { KEY_2, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAlt, Flags::IsDead, 0x0000 },
     { KEY_2, 0x0303, Qt::Key_Dead_Tilde, Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
+    { KEY_2, 0x0032, Qt::Key_2 | 0x04000000, Modifiers::ModControl, 0x00, 0x0000 },
 
     // KEY_3 (4)
     // """ Quotation Mark 0x0022
@@ -93,7 +94,7 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { KEY_3, 0x0033, Qt::Key_3, Modifiers::ModShift, 0x00, 0x0000 },
     { KEY_3, 0x0023, Qt::Key_NumberSign, Modifiers::ModAlt, 0x00, 0x0000 },
     { KEY_3, 0x0023, Qt::Key_NumberSign, Modifiers::ModAltGr, 0x00, 0x0000 },
-
+    { KEY_3, 0x0033, Qt::Key_3 | 0x04000000, Modifiers::ModControl, 0x00, 0x0000 },
 
     // KEY_4 (5)
     // "'" Apostrophe 0x0027
@@ -103,18 +104,21 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { KEY_4, 0x0034, Qt::Key_4, Modifiers::ModShift, 0x00, 0x0000 },
     { KEY_4, 0x00b4, Qt::Key_Dead_Acute, Modifiers::ModAlt, Flags::IsDead, 0x0000 },
     { KEY_4, 0x00b4, Qt::Key_Dead_Acute, Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
+    { KEY_4, 0x0034, Qt::Key_4 | 0x04000000, Modifiers::ModControl, 0x00, 0x0000 },
 
     // KEY_5 (6)
     // "(" Left Parenthesis 0x0028
     // "5" Digit Five 0x0035
     { KEY_5, 0x0028, Qt::Key_ParenLeft, 0x00, 0x00, 0x0000 },
     { KEY_5, 0x0035, Qt::Key_5, Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_5, 0x0035, Qt::Key_5 | 0x04000000, Modifiers::ModControl, 0x00, 0x0000 },
 
     // KEY_6 (7)
     // "-" Hyphen-Minus 0x002d
     // "6" Digit Six 0x0036
     { KEY_6, 0x002d, Qt::Key_hyphen, 0x00, 0x00, 0x0000 },
     { KEY_6, 0x0036, Qt::Key_6, Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_6, 0x0036, Qt::Key_6 | 0x04000000, Modifiers::ModControl, 0x00, 0x0000 },
 
     // KEY_7 (8)
     // "è" Latin Small Letter E with Grave 0x00e8
@@ -124,18 +128,21 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { KEY_7, 0x0037, Qt::Key_7, Modifiers::ModShift, 0x00, 0x0000 },
     { KEY_7, 0x0060, Qt::Key_Dead_Grave, Modifiers::ModAlt, Flags::IsDead, 0x0000 },
     { KEY_7, 0x0060, Qt::Key_Dead_Grave, Modifiers::ModAltGr, Flags::IsDead, 0x0000 },
+    { KEY_7, 0x0037, Qt::Key_7 | 0x04000000, Modifiers::ModControl, 0x00, 0x0000 },
 
     // KEY_8 (9)
     // "_" Low Line 0x005f
     // "8" Digit Eight 0x0038
     { KEY_8, 0x005f, Qt::Key_Underscore, 0x00, 0x00, 0x0000 },
     { KEY_8, 0x0038, Qt::Key_8, Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_8, 0x0038, Qt::Key_8 | 0x04000000, Modifiers::ModControl, 0x00, 0x0000 },
 
     // KEY_9 (10)
     // "ç" Latin Small Letter C with Cedilla 0x00e7
     // "9" Digit Nine 0x0039
     { KEY_9, 0x00e7, Qt::Key_Ccedilla, 0x00, Flags::IsCapsLockException, 0x0000 },
     { KEY_9, 0x0039, Qt::Key_9, Modifiers::ModShift, 0x00, 0x0000 },
+    { KEY_9, 0x0039, Qt::Key_9 | 0x04000000, Modifiers::ModControl, 0x00, 0x0000 },
 
     // KEY_0 (11)
     // "à" Latin Small Letter a with Grave 0x00e0
@@ -145,6 +152,7 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { KEY_0, 0x0030, Qt::Key_0, Modifiers::ModShift, 0x00, 0x0000 },
     { KEY_0, 0x0040, Qt::Key_At, Modifiers::ModAlt, 0x00, 0x0000 },
     { KEY_0, 0x0040, Qt::Key_At, Modifiers::ModAltGr, 0x00, 0x0000 },
+    { KEY_0, 0x0040, Qt::Key_0 | 0x04000000, Modifiers::ModControl, 0x00, 0x0000 },
 
     // Keycode 12 non-existent on Seabird.
     { 12, 0x002D, 0x0000002D, 0x00, 0x00, 0x0000 },
