@@ -452,6 +452,12 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
             }
         }
     } else if ((it->flags & EpaperEvdevKeyboardMap::IsSystem) && it->special && first_press) {
+        if (true) {
+            // We don't want these in production, but they might be useful in development, so just eat the press rather than removing the mappings.
+            qCWarning(EpaperEvdevKeyboardMapLog, "Ignoring system keypress: if you need these, you'll have to patch epaperevdevkeyboardhandler");
+            return None;
+        }
+
         switch (it->special) {
         case EpaperEvdevKeyboardMap::SystemReboot:
             result = Reboot;
