@@ -357,7 +357,7 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
             keycode = KEY_RIGHTALT;
             break;
         case KEY_END:
-            keycode = KEY_RIGHTALT;
+            keycode = KEY_LEFTALT;
             break;
         }
         break;
