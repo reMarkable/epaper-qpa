@@ -341,7 +341,7 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
             // Eventually, this should hopefully map to Qt::MetaModifier,
             // but for now we simply consume it to avoid bad things happening.
             return None;
-	default:
+        default:
             break;
         }
         break;
@@ -515,17 +515,17 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
         // a normal key was pressed
         const int modmask = Qt::ShiftModifier | Qt::ControlModifier | Qt::AltModifier | Qt::MetaModifier | Qt::KeypadModifier;
 
-	// was the key mapped to something specific with the current modifiers?
+        // was the key mapped to something specific with the current modifiers?
         const bool hadSpecificMappingWithModifiers = it == map_plain && it != map_withmod;
 
-	// or did the key have any special modifiers assigned?
-	const bool hadModifiersAssigned = (map_withmod->qtcode & modmask) != 0;
+        // or did the key have any special modifiers assigned?
+        const bool hadModifiersAssigned = (map_withmod->qtcode & modmask) != 0;
 
-	// if the key didn't have any specific mapping, or had no modifiers, or was a letter, then copy the current modifiers over.
-	// TODO: we should instead remove modifiers from qtcode on all IsLetter mappings, and then we can drop the IsLetter test below.
-	if (!hadSpecificMappingWithModifiers || !hadModifiersAssigned || (map_withmod->flags & EpaperEvdevKeyboardMap::IsLetter)) {
+        // if the key didn't have any specific mapping, or had no modifiers, or was a letter, then copy the current modifiers over.
+        // TODO: we should instead remove modifiers from qtcode on all IsLetter mappings, and then we can drop the IsLetter test below.
+        if (!hadSpecificMappingWithModifiers || !hadModifiersAssigned || (map_withmod->flags & EpaperEvdevKeyboardMap::IsLetter)) {
             qtcode |= EpaperEvdevKeyboardHandler::toQtModifiers(modifiers);
-	}
+        }
 
         if (m_composing == 2 && first_press && !(it->flags & EpaperEvdevKeyboardMap::IsModifier)) {
             // the last key press was the Compose key
