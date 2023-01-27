@@ -124,7 +124,7 @@ EpaperEvdevKeyboardManager::~EpaperEvdevKeyboardManager()
 void EpaperEvdevKeyboardManager::addKeyboard(const QString &deviceNode)
 {
     qCDebug(qLcEvdevKey, "Adding keyboard at %ls", qUtf16Printable(deviceNode));
-    auto keyboard = EpaperEvdevKeyboardHandler::create(deviceNode, m_spec, m_defaultKeymapFile);
+    auto keyboard = EpaperEvdevKeyboardHandler::create(deviceNode, m_spec);
     if (keyboard) {
         m_keyboards.add(deviceNode, std::move(keyboard));
         updateDeviceCount();
@@ -160,28 +160,10 @@ void EpaperEvdevKeyboardManager::setInputFlavor(EpaperEvdevKeyboardMap::InputFla
     }
 }
 
-void EpaperEvdevKeyboardManager::loadKeymap(const QString &file)
+void EpaperEvdevKeyboardManager::resetKeymap()
 {
-    m_defaultKeymapFile = file;
-
-    if (file.isEmpty()) {
-        // Restore the default, which is either the built-in keymap or
-        // the one given in the plugin spec.
-        QString keymapFromSpec;
-        const auto specs = m_spec.splitRef(QLatin1Char(':'));
-        for (const QStringRef &arg : specs) {
-            if (arg.startsWith(QLatin1String("keymap=")))
-                keymapFromSpec = arg.mid(7).toString();
-        }
-        for (const auto &keyboard : m_keyboards) {
-            if (keymapFromSpec.isEmpty())
-                keyboard.handler->unloadKeymap();
-            else
-                keyboard.handler->loadKeymap(keymapFromSpec);
-        }
-    } else {
-        for (const auto &keyboard : m_keyboards)
-            keyboard.handler->loadKeymap(file);
+    for (const auto &keyboard : m_keyboards) {
+        keyboard.handler->resetKeymap();
     }
 }
 

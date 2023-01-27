@@ -149,7 +149,7 @@ QFunctionPointer EpaperIntegration::platformFunction(const QByteArray &function)
 void EpaperIntegration::seabirdConnectionChangedStatic()
 {
     EpaperIntegration *self = EpaperIntegration::instance();
-    self->m_keyboardManager->loadKeymap(QString());
+    self->m_keyboardManager->resetKeymap();
 }
 
 void EpaperIntegration::seabirdCapsLockEnableStatic()

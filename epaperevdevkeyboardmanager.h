@@ -67,7 +67,7 @@ public:
     EpaperEvdevKeyboardManager(const QString &key, const QString &specification, QObject *parent = nullptr);
     ~EpaperEvdevKeyboardManager();
 
-    void loadKeymap(const QString &file);
+    void resetKeymap();
 
     void addKeyboard(const QString &deviceNode = QString());
     void removeKeyboard(const QString &deviceNode);
@@ -80,7 +80,6 @@ private:
 
     QString m_spec;
     QtInputSupport::DeviceHandlerList<EpaperEvdevKeyboardHandler> m_keyboards;
-    QString m_defaultKeymapFile;
 };
 
 QT_END_NAMESPACE

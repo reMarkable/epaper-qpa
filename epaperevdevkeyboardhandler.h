@@ -50,7 +50,6 @@
 // We mean it.
 //
 
-#include <QDataStream>
 #include <QFileSystemWatcher>
 #include <QTimer>
 #include <qobject.h>
@@ -149,26 +148,6 @@ enum Modifiers {
 };
 }
 
-inline QDataStream &operator>>(QDataStream &ds, EpaperEvdevKeyboardMap::Mapping &m)
-{
-    return ds >> m.keycode >> m.unicode >> m.qtcode >> m.modifiers >> m.flags >> m.special;
-}
-
-inline QDataStream &operator<<(QDataStream &ds, const EpaperEvdevKeyboardMap::Mapping &m)
-{
-    return ds << m.keycode << m.unicode << m.qtcode << m.modifiers << m.flags << m.special;
-}
-
-inline QDataStream &operator>>(QDataStream &ds, EpaperEvdevKeyboardMap::Composing &c)
-{
-    return ds >> c.first >> c.second >> c.result;
-}
-
-inline QDataStream &operator<<(QDataStream &ds, const EpaperEvdevKeyboardMap::Composing &c)
-{
-    return ds << c.first << c.second << c.result;
-}
-
 class EpaperEvdevFdContainer
 {
     int m_fd;
@@ -193,7 +172,7 @@ public:
 class EpaperEvdevKeyboardHandler : public QObject
 {
 public:
-    EpaperEvdevKeyboardHandler(const QString &device, EpaperEvdevFdContainer &fd, bool disableZap, bool enableCompose, const QString &keymapFile);
+    EpaperEvdevKeyboardHandler(const QString &device, EpaperEvdevFdContainer &fd, bool disableZap, bool enableCompose);
     ~EpaperEvdevKeyboardHandler();
 
     enum class EpaperEvdevInputLocale {
@@ -228,8 +207,7 @@ public:
     };
 
     static std::unique_ptr<EpaperEvdevKeyboardHandler> create(const QString &device,
-                                                              const QString &specification,
-                                                              const QString &defaultKeymapFile = QString());
+                                                              const QString &specification);
 
     static Qt::KeyboardModifiers toQtModifiers(quint8 mod)
     {
@@ -246,8 +224,7 @@ public:
         return qtmod;
     }
 
-    bool loadKeymap(const QString &file);
-    void unloadKeymap();
+    void resetKeymap();
 
     void readKeycode();
     KeycodeAction processKeycode(quint16 keycode, bool pressed, bool autorepeat);
