@@ -156,7 +156,7 @@ void EpaperEvdevFdContainer::reset() noexcept
     m_fd = -1;
 }
 
-EpaperEvdevKeyboardHandler::EpaperEvdevKeyboardHandler(const QString &device, EpaperEvdevFdContainer &fd, bool disableZap, bool enableCompose, const QString &keymapFile) :
+EpaperEvdevKeyboardHandler::EpaperEvdevKeyboardHandler(const QString &device, EpaperEvdevFdContainer &fd, bool disableZap, bool enableCompose) :
     m_device(device), m_fd(fd.release()), m_notify(nullptr),
     m_modifiers(0), m_composing(0), m_dead_unicode(0xffff),
     m_no_zap(disableZap), m_do_compose(enableCompose),
@@ -180,8 +180,7 @@ EpaperEvdevKeyboardHandler::EpaperEvdevKeyboardHandler(const QString &device, Ep
 
     memset(m_locks, 0, sizeof(m_locks));
 
-    if (keymapFile.isEmpty() || !loadKeymap(keymapFile))
-        unloadKeymap();
+    resetKeymap();
 
     // socket notifier for events on the keyboard device
     m_notify = new QSocketNotifier(m_fd.get(), QSocketNotifier::Read, this);
@@ -190,17 +189,15 @@ EpaperEvdevKeyboardHandler::EpaperEvdevKeyboardHandler(const QString &device, Ep
 
 EpaperEvdevKeyboardHandler::~EpaperEvdevKeyboardHandler()
 {
-    unloadKeymap();
+    resetKeymap();
 }
 
 std::unique_ptr<EpaperEvdevKeyboardHandler> EpaperEvdevKeyboardHandler::create(const QString &device,
-                                                                               const QString &specification,
-                                                                               const QString &defaultKeymapFile)
+                                                                               const QString &specification)
 {
     qCDebug(EpaperEvdevKeyboardLog, "Try to create keyboard handler for \"%ls\" \"%ls\"",
             qUtf16Printable(device), qUtf16Printable(specification));
 
-    QString keymapFile = defaultKeymapFile;
     int repeatDelay = 400;
     int repeatRate = 80;
     bool disableZap = false;
@@ -209,9 +206,7 @@ std::unique_ptr<EpaperEvdevKeyboardHandler> EpaperEvdevKeyboardHandler::create(c
 
     const auto args = specification.splitRef(QLatin1Char(':'));
     for (const QStringRef &arg : args) {
-        if (arg.startsWith(QLatin1String("keymap=")))
-            keymapFile = arg.mid(7).toString();
-        else if (arg == QLatin1String("disable-zap"))
+        if (arg == QLatin1String("disable-zap"))
             disableZap = true;
         else if (arg == QLatin1String("enable-compose"))
             enableCompose = true;
@@ -233,7 +228,7 @@ std::unique_ptr<EpaperEvdevKeyboardHandler> EpaperEvdevKeyboardHandler::create(c
             ::ioctl(fd.get(), EVIOCSREP, kbdrep);
         }
 
-        return std::unique_ptr<EpaperEvdevKeyboardHandler>(new EpaperEvdevKeyboardHandler(device, fd, disableZap, enableCompose, keymapFile));
+        return std::unique_ptr<EpaperEvdevKeyboardHandler>(new EpaperEvdevKeyboardHandler(device, fd, disableZap, enableCompose));
     } else {
         qErrnoWarning("Cannot open keyboard input device '%ls'", qUtf16Printable(device));
         return nullptr;
@@ -645,28 +640,21 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
 #include "map/epaperevdevkeyboardmap_dk.h"
 #include "map/epaperevdevkeyboardmap_se.h"
 
-void EpaperEvdevKeyboardHandler::unloadKeymap()
+void EpaperEvdevKeyboardHandler::resetKeymap()
 {
-    qCDebug(EpaperEvdevKeyboardLog, "Unload current keymap and restore built-in");
-
     QSettings settings;
     QString locale = settings.value("InputLocale").toString();
 
     // Check if input locale is set in xochitl.conf (set from type folio settings in the GUI).
     // If not, fetch the layout from the firmware and make assumptions (e.g. that nordic keyboard is Norwegian and not Swedish).
     auto keymap = EpaperEvdevInputLocale::UnitedStates;
-    if (auto const keymapOpt = determineKeymapSettings())
-    {
+    if (auto const keymapOpt = determineKeymapSettings()) {
         qCDebug(EpaperEvdevKeyboardLog) << "Keymap has been determined by the QT settings.";
         keymap = keymapOpt.value();
-    }
-    else if (auto const keymapOpt = determineKeymapFirmware())
-    {
+    } else if (auto const keymapOpt = determineKeymapFirmware()) {
         qCDebug(EpaperEvdevKeyboardLog) << "Keymap has been determined by the firmware settings.";
         keymap = keymapOpt.value();
-    }
-    else
-    {
+    } else {
         qCWarning(EpaperEvdevKeyboardLog) << "No keymap set by QT settings or firmware, defaulting to US.";
     }
     m_prevLocale = keymap;
@@ -742,66 +730,6 @@ void EpaperEvdevKeyboardHandler::unloadKeymap()
     }
 }
 
-bool EpaperEvdevKeyboardHandler::loadKeymap(const QString &file)
-{
-    qCDebug(EpaperEvdevKeyboardLog, "Loading keymap %ls", qUtf16Printable(file));
-
-    QFile f(file);
-
-    if (!f.open(QIODevice::ReadOnly)) {
-        qWarning("Could not open keymap file '%ls'", qUtf16Printable(file));
-        return false;
-    }
-
-    // .qmap files have a very simple structure:
-    // quint32 magic           (QKeyboard::FileMagic)
-    // quint32 version         (1)
-    // quint32 keymap_size     (# of struct QKeyboard::Mappings)
-    // quint32 keycompose_size (# of struct QKeyboard::Composings)
-    // all QKeyboard::Mappings via QDataStream::operator(<<|>>)
-    // all QKeyboard::Composings via QDataStream::operator(<<|>>)
-
-    quint32 qmap_magic, qmap_version, qmap_keymap_size, qmap_keycompose_size;
-
-    QDataStream ds(&f);
-
-    ds >> qmap_magic >> qmap_version >> qmap_keymap_size >> qmap_keycompose_size;
-
-    if (ds.status() != QDataStream::Ok || qmap_magic != EpaperEvdevKeyboardMap::FileMagic || qmap_version != 1 || qmap_keymap_size == 0) {
-        qWarning("'%ls' is not a valid .qmap keymap file", qUtf16Printable(file));
-        return false;
-    }
-
-    EpaperEvdevKeyboardMap::Mapping *qmap_keymap = new EpaperEvdevKeyboardMap::Mapping[qmap_keymap_size];
-    EpaperEvdevKeyboardMap::Composing *qmap_keycompose = qmap_keycompose_size ? new EpaperEvdevKeyboardMap::Composing[qmap_keycompose_size] : 0;
-
-    for (quint32 i = 0; i < qmap_keymap_size; ++i)
-        ds >> qmap_keymap[i];
-    for (quint32 i = 0; i < qmap_keycompose_size; ++i)
-        ds >> qmap_keycompose[i];
-
-    if (ds.status() != QDataStream::Ok) {
-        delete[] qmap_keymap;
-        delete[] qmap_keycompose;
-
-        qWarning("Keymap file '%ls' cannot be loaded.", qUtf16Printable(file));
-        return false;
-    }
-
-    // unload currently active and clear state
-    unloadKeymap();
-
-    m_keymap = qmap_keymap;
-    m_keymap_size = qmap_keymap_size;
-    m_keycompose = qmap_keycompose;
-    m_keycompose_size = qmap_keycompose_size;
-
-    m_do_compose = true;
-    m_didLoadKeymap = true;
-
-    return true;
-}
-
 void EpaperEvdevKeyboardHandler::setCapsLockEnabled(bool enabled)
 {
     m_locks[0] = enabled ? 1 : 0;
@@ -812,7 +740,7 @@ void EpaperEvdevKeyboardHandler::setInputFlavor(EpaperEvdevKeyboardMap::InputFla
     qCDebug(EpaperEvdevKeyboardLog) << "Input flavor is set to " << ((flavor == EpaperEvdevKeyboardMap::InputFlavor::Windows) ? "Windows" : "Apple");
     if (flavor != m_flavor) {
         m_flavor = flavor;
-        unloadKeymap();
+        resetKeymap();
     }
 }
 
@@ -826,8 +754,8 @@ void EpaperEvdevKeyboardHandler::onSettingsChanged()
     if (auto const newLocale = determineKeymapSettings(); newLocale != m_prevLocale)
     {
         qCDebug(EpaperEvdevKeyboardLog) << "Input locale setting has changed, updating the key map.";
-        unloadKeymap();
-        // `m_prevLocale = newLocale` done inside unloadKeymap()
+        resetKeymap();
+        // `m_prevLocale = newLocale` done inside resetKeymap()
     }
 }
 
