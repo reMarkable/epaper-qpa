@@ -336,13 +336,21 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
 {
     switch (m_flavor) {
     case EpaperEvdevKeyboardMap::InputFlavor::Windows:
-        // No changes needed in this flavor
+        switch (keycode) {
+        case KEY_END:
+            // Eventually, this should hopefully map to Qt::MetaModifier,
+            // but for now we simply consume it to avoid bad things happening.
+            return None;
+	default:
+            break;
+        }
         break;
     case EpaperEvdevKeyboardMap::InputFlavor::Apple:
         switch (keycode) {
         case KEY_LEFTCTRL:
-            keycode = KEY_END;
-            break;
+            // Eventually, this should hopefully map to Qt::MetaModifier,
+            // but for now we simply consume it to avoid bad things happening.
+            return None;
         case KEY_LEFTALT:
             keycode = KEY_LEFTCTRL;
             break;
