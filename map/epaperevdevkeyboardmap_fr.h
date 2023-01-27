@@ -191,8 +191,8 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
 
     // KEY_E (18)
     // "€" Euro Sign 0x20ac
-    { KEY_E, 0x0065, Qt::Key_E, 0x00, 0x00, 0x0000 },
-    { KEY_E, 0x0045, Qt::Key_E, 0x01, 0x00, 0x0000 },
+    { KEY_E, 0x0065, Qt::Key_E, 0x00, Flags::IsLetter, 0x0000 },
+    { KEY_E, 0x0045, Qt::Key_E, 0x01, Flags::IsLetter, 0x0000 },
     { KEY_E, 0x20ac, Qt::Key_Greater, 0x02, 0x00, 0x0000 },
     { KEY_E, 0x20ac, Qt::Key_Greater, 0x03, 0x00, 0x0000 },
     { KEY_E, 0x0065, Qt::Key_E | 0x04000000, 0x04, 0x00, 0x0000 },
@@ -348,8 +348,8 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     // "w" Latin Small Letter W 0x0077
     // "W" Latin Capital Letter W 0x0057
     // "<" Less-Than Sign 0x003c
-    { KEY_Z, 0x0077, Qt::Key_W, 0x00, 0x00, 0x0000 },
-    { KEY_Z, 0x0057, Qt::Key_W, 0x01, 0x00, 0x0000 },
+    { KEY_Z, 0x0077, Qt::Key_W, 0x00, Flags::IsLetter, 0x0000 },
+    { KEY_Z, 0x0057, Qt::Key_W, 0x01, Flags::IsLetter, 0x0000 },
     { KEY_Z, 0x003c, Qt::Key_Less, 0x02, 0x00, 0x0000 },
     { KEY_Z, 0x003c, Qt::Key_Less, 0x03, 0x00, 0x0000 },
     { KEY_Z, 0x0077, Qt::Key_W | 0x04000000, 0x04, 0x00, 0x0000 },
@@ -369,8 +369,8 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     // "x" 0x0078
     // "X" 0x0058
     // ">" Greater-Than Sign 0x003e
-    { KEY_X, 0x0078, Qt::Key_X, 0x00, 0x00, 0x0000 },
-    { KEY_X, 0x0058, Qt::Key_X, 0x01, 0x00, 0x0000 },
+    { KEY_X, 0x0078, Qt::Key_X, 0x00, Flags::IsLetter, 0x0000 },
+    { KEY_X, 0x0058, Qt::Key_X, 0x01, Flags::IsLetter, 0x0000 },
     { KEY_X, 0x003e, Qt::Key_Greater, 0x02, 0x00, 0x0000 },
     { KEY_X, 0x003e, Qt::Key_Greater, 0x03, 0x00, 0x0000 },
     { KEY_X, 0x0078, Qt::Key_X | 0x04000000, 0x04, 0x00, 0x0000 },
