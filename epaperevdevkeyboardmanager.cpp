@@ -155,7 +155,7 @@ void EpaperEvdevKeyboardManager::setCapsLockEnabled(bool enabled)
 
 void EpaperEvdevKeyboardManager::setInputFlavor(EpaperEvdevKeyboardMap::InputFlavor flavor)
 {
-    for (auto const& keyboard : m_keyboards) {
+    for (auto const &keyboard : m_keyboards) {
         keyboard.handler->setInputFlavor(flavor);
     }
 }

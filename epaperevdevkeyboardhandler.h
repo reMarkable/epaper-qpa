@@ -97,15 +97,18 @@ struct Mapping
     quint16 special;
 };
 
-inline auto tieMapping(Mapping const& mapping) {
+inline auto tieMapping(Mapping const &mapping)
+{
     return std::tie(mapping.keycode, mapping.unicode, mapping.qtcode, mapping.modifiers, mapping.flags, mapping.special);
 }
 
-inline bool operator==(Mapping const& a, Mapping const& b) {
+inline bool operator==(Mapping const &a, Mapping const &b)
+{
     return tieMapping(a) == tieMapping(b);
 }
 
-inline bool operator!=(Mapping const& a, Mapping const& b) {
+inline bool operator!=(Mapping const &a, Mapping const &b)
+{
     return tieMapping(a) != tieMapping(b);
 }
 
@@ -236,7 +239,7 @@ private:
                          Qt::KeyboardModifiers modifiers, bool isPress, bool autoRepeat);
     void switchLed(int, bool);
 
-    template<typename LocaleType>
+    template <typename LocaleType>
     void populateKeymap();
 
     QString m_device;
@@ -253,9 +256,9 @@ private:
     bool m_do_compose;
 
     bool m_didLoadKeymap = false;
-    EpaperEvdevKeyboardMap::Mapping* m_keymap;
+    EpaperEvdevKeyboardMap::Mapping *m_keymap;
     int m_keymap_size;
-    const EpaperEvdevKeyboardMap::Composing* m_keycompose;
+    const EpaperEvdevKeyboardMap::Composing *m_keycompose;
     int m_keycompose_size;
 
     std::vector<std::pair<quint16, quint16>> m_capsLockException;

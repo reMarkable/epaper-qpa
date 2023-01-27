@@ -39,8 +39,8 @@
 
 #include "epaperevdevkeyboardhandler.h"
 
-#include <optional>
 #include <algorithm>
+#include <optional>
 #include <qplatformdefs.h>
 
 #include <QCoreApplication>
@@ -73,80 +73,79 @@ QT_BEGIN_NAMESPACE
 Q_LOGGING_CATEGORY(EpaperEvdevKeyboardLog, "rm.epaperkeyboardhandler")
 Q_LOGGING_CATEGORY(EpaperEvdevKeyboardMapLog, "rm.epaperkeyboardhandler.map")
 
-namespace
+namespace {
+QSettings const qtSettings("remarkable", "xochitl");
+QString const sysfsLangFile("/sys/pogo/status/lang");
+
+using EpaperEvdevInputLocale = EpaperEvdevKeyboardHandler::EpaperEvdevInputLocale;
+
+// Reads the sysfs file for the lang value set by the keyboard firmware.
+// Only to be used as fallback; QT settings should have precedence over this value.
+std::optional<EpaperEvdevInputLocale> determineKeymapFirmware()
 {
-    QSettings const qtSettings("remarkable", "xochitl");
-    QString const sysfsLangFile("/sys/pogo/status/lang");
-
-    using EpaperEvdevInputLocale = EpaperEvdevKeyboardHandler::EpaperEvdevInputLocale;
-
-    // Reads the sysfs file for the lang value set by the keyboard firmware.
-    // Only to be used as fallback; QT settings should have precedence over this value.
-    std::optional<EpaperEvdevInputLocale> determineKeymapFirmware()
-    {
-        QFile file(sysfsLangFile);
-        if (!file.open(QIODevice::ReadOnly)) {
-            // No keyboard attached means we fall back to the (unaltered) US keymap.
-            qCWarning(EpaperEvdevKeyboardLog) << "Failed to open pogo lang status: " << file.errorString();
-            return {};
-        }
-
-        QByteArray langCode = file.readAll();
-        qCDebug(EpaperEvdevKeyboardLog) << "Read a langCode of " << langCode;
-        if (langCode.isEmpty()) {
-            // This shouldn't happen, but if it does, try to behave sensibly.
-            return {};
-        }
-
-        // Possible language codes in firmware are listed in remarkable/linux-internal repo.
-        if (langCode == "DE") {
-            return EpaperEvdevInputLocale::Germany;
-        } else if (langCode == "ES") {
-            return EpaperEvdevInputLocale::Spain;
-        } else if (langCode == "FR") {
-            return EpaperEvdevInputLocale::France;
-        } else if (langCode == "NO") {
-            return EpaperEvdevInputLocale::Norway;
-        } else if (langCode == "UK") {
-            return EpaperEvdevInputLocale::UnitedKingdom;
-        } else if (langCode == "US") {
-            return EpaperEvdevInputLocale::UnitedStates;
-        } else {
-            // "ILLEGAL": Ideally should not be reported, but exists in the code.
-            // "IT", "PT": Implementation of Italian and Portuguese have been postponed indefinitely.
-            return EpaperEvdevInputLocale::UnitedKingdom;
-        }
-
+    QFile file(sysfsLangFile);
+    if (!file.open(QIODevice::ReadOnly)) {
+        // No keyboard attached means we fall back to the (unaltered) US keymap.
+        qCWarning(EpaperEvdevKeyboardLog) << "Failed to open pogo lang status: " << file.errorString();
         return {};
     }
 
-    // Reads the input locale setting, set from "Type Folio - Keyboard language" in settings menu.
-    std::optional<EpaperEvdevInputLocale> determineKeymapSettings()
-    {
-        QString locale = qtSettings.value("InputLocale").toString();
-
-        if (locale == "no_DK") {
-            return EpaperEvdevInputLocale::Denmark;
-        } else if (locale == "no_NO") {
-            return EpaperEvdevInputLocale::Norway;
-        } else if (locale == "no_SV") {
-            return EpaperEvdevInputLocale::Sweden;
-        } else if (locale == "fi_FI") {
-            return EpaperEvdevInputLocale::Finland;
-        } else if (locale == "en_UK") {
-            return EpaperEvdevInputLocale::UnitedKingdom;
-        } else if (locale == "en_US") {
-            return EpaperEvdevInputLocale::UnitedStates;
-        } else if (locale == "es_ES") {
-            return EpaperEvdevInputLocale::Spain;
-        } else if (locale == "fr_FR") {
-            return EpaperEvdevInputLocale::France;
-        } else if (locale == "de_DE") {
-            return EpaperEvdevInputLocale::Germany;
-        }
-
+    QByteArray langCode = file.readAll();
+    qCDebug(EpaperEvdevKeyboardLog) << "Read a langCode of " << langCode;
+    if (langCode.isEmpty()) {
+        // This shouldn't happen, but if it does, try to behave sensibly.
         return {};
     }
+
+    // Possible language codes in firmware are listed in remarkable/linux-internal repo.
+    if (langCode == "DE") {
+        return EpaperEvdevInputLocale::Germany;
+    } else if (langCode == "ES") {
+        return EpaperEvdevInputLocale::Spain;
+    } else if (langCode == "FR") {
+        return EpaperEvdevInputLocale::France;
+    } else if (langCode == "NO") {
+        return EpaperEvdevInputLocale::Norway;
+    } else if (langCode == "UK") {
+        return EpaperEvdevInputLocale::UnitedKingdom;
+    } else if (langCode == "US") {
+        return EpaperEvdevInputLocale::UnitedStates;
+    } else {
+        // "ILLEGAL": Ideally should not be reported, but exists in the code.
+        // "IT", "PT": Implementation of Italian and Portuguese have been postponed indefinitely.
+        return EpaperEvdevInputLocale::UnitedKingdom;
+    }
+
+    return {};
+}
+
+// Reads the input locale setting, set from "Type Folio - Keyboard language" in settings menu.
+std::optional<EpaperEvdevInputLocale> determineKeymapSettings()
+{
+    QString locale = qtSettings.value("InputLocale").toString();
+
+    if (locale == "no_DK") {
+        return EpaperEvdevInputLocale::Denmark;
+    } else if (locale == "no_NO") {
+        return EpaperEvdevInputLocale::Norway;
+    } else if (locale == "no_SV") {
+        return EpaperEvdevInputLocale::Sweden;
+    } else if (locale == "fi_FI") {
+        return EpaperEvdevInputLocale::Finland;
+    } else if (locale == "en_UK") {
+        return EpaperEvdevInputLocale::UnitedKingdom;
+    } else if (locale == "en_US") {
+        return EpaperEvdevInputLocale::UnitedStates;
+    } else if (locale == "es_ES") {
+        return EpaperEvdevInputLocale::Spain;
+    } else if (locale == "fr_FR") {
+        return EpaperEvdevInputLocale::France;
+    } else if (locale == "de_DE") {
+        return EpaperEvdevInputLocale::Germany;
+    }
+
+    return {};
+}
 }
 
 void EpaperEvdevFdContainer::reset() noexcept
@@ -377,13 +376,10 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
     for (int i = 0; i < m_keymap_size && !(map_plain && map_withmod); ++i) {
         const EpaperEvdevKeyboardMap::Mapping *m = m_keymap + i;
         if (m->keycode == keycode) {
-            if (m->modifiers == 0)
-            {
+            if (m->modifiers == 0) {
                 map_plain = *m;
 
-                if (m_locks[0] /*CapsLock*/ &&
-                    m->flags & EpaperEvdevKeyboardMap::IsCapsLockException)
-                {
+                if (m_locks[0] /*CapsLock*/ && m->flags & EpaperEvdevKeyboardMap::IsCapsLockException) {
                     // If caps lock is pressed, no modifiers (shift, alt, etc.) are present and the character is flagged as caps lock exception;
                     // print the character mapped under m_capsLockException and skip the other checks.
                     // E.g.: KEY_0 on French locale: Plain: "à", shift: "0", alt/altgr: "@", caps lock: "À".
@@ -391,11 +387,10 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
                     auto const exceptionFound = std::find_if(
                         m_capsLockException.begin(),
                         m_capsLockException.end(),
-                        [m](auto const& exception) {
+                        [m](auto const &exception) {
                             return m->unicode == exception.first;
                         });
-                    if (exceptionFound != m_capsLockException.end())
-                    {
+                    if (exceptionFound != m_capsLockException.end()) {
                         map_plain->unicode = exceptionFound->second;
                     }
                 }
@@ -403,8 +398,7 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
             quint8 testmods = m_modifiers;
             if (m_locks[0] /*CapsLock*/ && (m->flags & EpaperEvdevKeyboardMap::IsLetter))
                 testmods ^= EpaperEvdevKeyboardMap::ModShift;
-            if (m->modifiers == testmods && m->modifiers != EpaperEvdevKeyboardMap::ModPlain)
-            {
+            if (m->modifiers == testmods && m->modifiers != EpaperEvdevKeyboardMap::ModPlain) {
                 map_withmod = *m;
             }
         }
@@ -631,14 +625,14 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
 }
 
 // builtin keymaps
-#include "map/epaperevdevkeyboardmap_no.h"
-#include "map/epaperevdevkeyboardmap_us_rm.h"
-#include "map/epaperevdevkeyboardmap_es.h"
-#include "map/epaperevdevkeyboardmap_fr.h"
-#include "map/epaperevdevkeyboardmap_uk.h"
 #include "map/epaperevdevkeyboardmap_de.h"
 #include "map/epaperevdevkeyboardmap_dk.h"
+#include "map/epaperevdevkeyboardmap_es.h"
+#include "map/epaperevdevkeyboardmap_fr.h"
+#include "map/epaperevdevkeyboardmap_no.h"
 #include "map/epaperevdevkeyboardmap_se.h"
+#include "map/epaperevdevkeyboardmap_uk.h"
+#include "map/epaperevdevkeyboardmap_us_rm.h"
 
 void EpaperEvdevKeyboardHandler::resetKeymap()
 {
@@ -751,16 +745,16 @@ void EpaperEvdevKeyboardHandler::onSettingsChanged()
     m_watcher.addPath(qtSettings.fileName());
 
     // Skip if config change is irrelevant to us.
-    if (auto const newLocale = determineKeymapSettings(); newLocale != m_prevLocale)
-    {
+    if (auto const newLocale = determineKeymapSettings(); newLocale != m_prevLocale) {
         qCDebug(EpaperEvdevKeyboardLog) << "Input locale setting has changed, updating the key map.";
         resetKeymap();
         // `m_prevLocale = newLocale` done inside resetKeymap()
     }
 }
 
-template<typename LocaleType>
-void EpaperEvdevKeyboardHandler::populateKeymap() {
+template <typename LocaleType>
+void EpaperEvdevKeyboardHandler::populateKeymap()
+{
     delete[] m_keymap;
     m_keymap = nullptr;
 
