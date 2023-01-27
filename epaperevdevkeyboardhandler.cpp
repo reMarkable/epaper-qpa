@@ -330,32 +330,17 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
 {
     switch (m_flavor) {
     case EpaperEvdevKeyboardMap::InputFlavor::Windows:
-        switch (keycode) {
-        case KEY_END:
-            // Eventually, this should hopefully map to Qt::MetaModifier,
-            // but for now we simply consume it to avoid bad things happening.
-            return None;
-        default:
-            break;
-        }
+        // Nothing to do here...
         break;
     case EpaperEvdevKeyboardMap::InputFlavor::Apple:
         switch (keycode) {
         case KEY_LEFTCTRL:
-            // Eventually, this should hopefully map to Qt::MetaModifier,
-            // but for now we simply consume it to avoid bad things happening.
-            return None;
+            keycode = KEY_END;
+            break;
         case KEY_LEFTALT:
             keycode = KEY_LEFTCTRL;
             break;
         case KEY_RIGHTALT:
-            keycode = KEY_RIGHTALT;
-            break;
-        case KEY_HOME:
-            // TODO(Cem):
-            // Home (bullet/rM) key is dropped after PVT. This line is now redundant,
-            // but can be kept until we're sure there are no EVT/DVT birds lying around.
-            // KEY_HOME (102)
             keycode = KEY_RIGHTALT;
             break;
         case KEY_END:
