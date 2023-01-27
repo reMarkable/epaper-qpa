@@ -370,7 +370,7 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
 
     std::optional<EpaperEvdevKeyboardMap::Mapping> map_plain, map_withmod;
 
-    quint8 modifiers = m_modifiers;
+    auto modifiers = m_modifiers;
 
     // get a specific and plain mapping for the keycode and the current modifiers
     for (int i = 0; i < m_keymap_size && !(map_plain && map_withmod); ++i) {
@@ -395,7 +395,7 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
                     }
                 }
             }
-            quint8 testmods = m_modifiers;
+            auto testmods = m_modifiers;
             if (m_locks[0] /*CapsLock*/ && (m->flags & EpaperEvdevKeyboardMap::IsLetter))
                 testmods ^= EpaperEvdevKeyboardMap::ModShift;
             if (m->modifiers == testmods && m->modifiers != EpaperEvdevKeyboardMap::ModPlain) {
@@ -424,10 +424,11 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
 
     if ((it->flags & EpaperEvdevKeyboardMap::IsModifier) && it->special) {
         // this is a modifier, i.e. Shift, Alt, ...
-        if (pressed)
-            m_modifiers |= quint8(it->special);
-        else
-            m_modifiers &= ~quint8(it->special);
+        if (pressed) {
+            m_modifiers |= it->special;
+        } else {
+            m_modifiers &= ~it->special;
+        }
     } else if (qtcode >= Qt::Key_CapsLock && qtcode <= Qt::Key_ScrollLock) {
         // (Caps|Num|Scroll)Lock
         if (first_press) {

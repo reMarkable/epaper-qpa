@@ -87,7 +87,7 @@ struct Mapping
     // Modifiers for the key, used to match events.
     // If 0, then this is a plain key mapping.
     // Otherwise, the modifiers on the mapping must be set for this mapping to match
-    quint8 modifiers;
+    quint16 modifiers;
 
     // See the Flags enum below
     quint8 flags;
@@ -146,8 +146,8 @@ enum Modifiers {
     ModShiftL = 0x10,
     ModShiftR = 0x20,
     ModCtrlL = 0x40,
-    ModCtrlR = 0x80
-    // ModCapsShift = 0x100, // not supported!
+    ModCtrlR = 0x80,
+    ModMeta = 0x100,
 };
 }
 
@@ -212,17 +212,22 @@ public:
     static std::unique_ptr<EpaperEvdevKeyboardHandler> create(const QString &device,
                                                               const QString &specification);
 
-    static Qt::KeyboardModifiers toQtModifiers(quint8 mod)
+    static Qt::KeyboardModifiers toQtModifiers(quint16 mod)
     {
         Qt::KeyboardModifiers qtmod = Qt::NoModifier;
 
-        // FIXME: These will probably have to respect the keyboard flavour setting
-        if (mod & (EpaperEvdevKeyboardMap::ModShift | EpaperEvdevKeyboardMap::ModShiftL | EpaperEvdevKeyboardMap::ModShiftR))
+        if (mod & (EpaperEvdevKeyboardMap::ModShift | EpaperEvdevKeyboardMap::ModShiftL | EpaperEvdevKeyboardMap::ModShiftR)) {
             qtmod |= Qt::ShiftModifier;
-        if (mod & (EpaperEvdevKeyboardMap::ModControl | EpaperEvdevKeyboardMap::ModCtrlL | EpaperEvdevKeyboardMap::ModCtrlR))
+        }
+        if (mod & (EpaperEvdevKeyboardMap::ModControl | EpaperEvdevKeyboardMap::ModCtrlL | EpaperEvdevKeyboardMap::ModCtrlR)) {
             qtmod |= Qt::ControlModifier;
-        if (mod & EpaperEvdevKeyboardMap::ModAlt)
+        }
+        if (mod & EpaperEvdevKeyboardMap::ModAlt) {
             qtmod |= Qt::AltModifier;
+        }
+        if (mod & EpaperEvdevKeyboardMap::ModMeta) {
+            qtmod |= Qt::MetaModifier;
+        }
 
         return qtmod;
     }
@@ -247,7 +252,7 @@ private:
     QSocketNotifier *m_notify;
 
     // keymap handling
-    quint8 m_modifiers;
+    quint16 m_modifiers;
     quint8 m_locks[3];
     int m_composing;
     quint16 m_dead_unicode;
