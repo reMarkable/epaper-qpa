@@ -512,7 +512,7 @@ constexpr static EpaperEvdevKeyboardMap::Mapping keymap[] = {
     { KEY_RIGHT, 0xffff, 0x01000000, 0x0c, 0x08, 0x0181 },
 
     // KEY_END (107)
-    { KEY_END, 0xffff, 0x01000011, 0x00, 0x00, 0x0000 },
+    { KEY_END, 0xffff, 0x01000022, 0x00, Flags::IsModifier, Modifiers::ModMeta },
 
     // KEY_DOWN (108)
     { KEY_DOWN, 0xffff, 0x01000015, 0x00, 0x00, 0x0000 },
