@@ -330,32 +330,17 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
 {
     switch (m_flavor) {
     case EpaperEvdevKeyboardMap::InputFlavor::Windows:
-        switch (keycode) {
-        case KEY_END:
-            // Eventually, this should hopefully map to Qt::MetaModifier,
-            // but for now we simply consume it to avoid bad things happening.
-            return None;
-        default:
-            break;
-        }
+        // Nothing to do here...
         break;
     case EpaperEvdevKeyboardMap::InputFlavor::Apple:
         switch (keycode) {
         case KEY_LEFTCTRL:
-            // Eventually, this should hopefully map to Qt::MetaModifier,
-            // but for now we simply consume it to avoid bad things happening.
-            return None;
+            keycode = KEY_END;
+            break;
         case KEY_LEFTALT:
             keycode = KEY_LEFTCTRL;
             break;
         case KEY_RIGHTALT:
-            keycode = KEY_RIGHTALT;
-            break;
-        case KEY_HOME:
-            // TODO(Cem):
-            // Home (bullet/rM) key is dropped after PVT. This line is now redundant,
-            // but can be kept until we're sure there are no EVT/DVT birds lying around.
-            // KEY_HOME (102)
             keycode = KEY_RIGHTALT;
             break;
         case KEY_END:
@@ -370,7 +355,7 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
 
     std::optional<EpaperEvdevKeyboardMap::Mapping> map_plain, map_withmod;
 
-    quint8 modifiers = m_modifiers;
+    auto modifiers = m_modifiers;
 
     // get a specific and plain mapping for the keycode and the current modifiers
     for (int i = 0; i < m_keymap_size && !(map_plain && map_withmod); ++i) {
@@ -395,7 +380,7 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
                     }
                 }
             }
-            quint8 testmods = m_modifiers;
+            auto testmods = m_modifiers;
             if (m_locks[0] /*CapsLock*/ && (m->flags & EpaperEvdevKeyboardMap::IsLetter))
                 testmods ^= EpaperEvdevKeyboardMap::ModShift;
             if (m->modifiers == testmods && m->modifiers != EpaperEvdevKeyboardMap::ModPlain) {
@@ -424,10 +409,11 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
 
     if ((it->flags & EpaperEvdevKeyboardMap::IsModifier) && it->special) {
         // this is a modifier, i.e. Shift, Alt, ...
-        if (pressed)
-            m_modifiers |= quint8(it->special);
-        else
-            m_modifiers &= ~quint8(it->special);
+        if (pressed) {
+            m_modifiers |= it->special;
+        } else {
+            m_modifiers &= ~it->special;
+        }
     } else if (qtcode >= Qt::Key_CapsLock && qtcode <= Qt::Key_ScrollLock) {
         // (Caps|Num|Scroll)Lock
         if (first_press) {
