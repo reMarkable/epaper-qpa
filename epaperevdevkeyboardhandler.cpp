@@ -203,8 +203,9 @@ std::unique_ptr<EpaperEvdevKeyboardHandler> EpaperEvdevKeyboardHandler::create(c
     bool enableCompose = false;
     int grab = 0;
 
-    const auto args = specification.splitRef(QLatin1Char(':'));
-    for (const QStringRef &arg : args) {
+// FIXME use QStringView!
+    const auto args = specification.split(QLatin1Char(':'));
+    for (const QString &arg : args) {
         if (arg == QLatin1String("disable-zap"))
             disableZap = true;
         else if (arg == QLatin1String("enable-compose"))

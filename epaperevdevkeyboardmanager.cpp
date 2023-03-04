@@ -41,7 +41,8 @@
 
 #include <QCoreApplication>
 #include <QLoggingCategory>
-#include <QStringList>
+#include <QString>
+#include <QStringView>
 
 #include <private/qguiapplication_p.h>
 #include <private/qinputdevicemanager_p_p.h>
@@ -56,23 +57,23 @@ namespace EpaperEvdevUtil {
 struct ParsedSpecification
 {
     QString spec;
-    QStringList devices;
-    QVector<QStringRef> args;
+    QList<QString> devices;
+    QList<QStringView> args;
 };
 
 ParsedSpecification parseSpecification(const QString &specification)
 {
     ParsedSpecification result;
 
-    result.args = specification.splitRef(QLatin1Char(':'));
+    result.args = QStringView{specification}.split(QLatin1Char(':'));
 
-    for (const QStringRef &arg : qAsConst(result.args)) {
-        if (arg.startsWith(QLatin1String("/dev/"))) {
+    for (const QStringView &arg : qAsConst(result.args)) {
+        if (arg.startsWith(QString("/dev/"))) {
             // if device is specified try to use it
             result.devices.append(arg.toString());
         } else {
             // build new specification without /dev/ elements
-            result.spec += arg + QLatin1Char(':');
+            result.spec += arg.toString() + QLatin1Char(':');
         }
     }
 
