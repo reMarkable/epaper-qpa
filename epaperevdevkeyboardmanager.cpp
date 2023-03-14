@@ -42,7 +42,6 @@
 #include <QCoreApplication>
 #include <QLoggingCategory>
 #include <QString>
-#include <QStringView>
 
 #include <private/qguiapplication_p.h>
 #include <private/qinputdevicemanager_p_p.h>
@@ -58,14 +57,14 @@ struct ParsedSpecification
 {
     QString spec;
     QList<QString> devices;
-    QList<QStringView> args;
+    QList<QString> args;
 };
 
 ParsedSpecification parseSpecification(const QString &specification)
 {
     ParsedSpecification result;
 
-    result.args = QStringView{specification}.split(QLatin1Char(':'));
+    result.args = specification.split(QLatin1Char(':'));
 
     for (const QStringView &arg : qAsConst(result.args)) {
         if (arg.startsWith(QString("/dev/"))) {
