@@ -155,11 +155,11 @@ void EpaperEvdevFdContainer::reset() noexcept
     m_fd = -1;
 }
 
-EpaperEvdevKeyboardHandler::EpaperEvdevKeyboardHandler(const QString &device, EpaperEvdevFdContainer &fd, bool disableZap, bool enableCompose) :
+EpaperEvdevKeyboardHandler::EpaperEvdevKeyboardHandler(const QString &device, EpaperEvdevFdContainer &fd, bool disableZap) :
     m_device(device), m_fd(fd.release()), m_notify(nullptr),
-    m_modifiers(0), m_composing(0), m_dead_unicode(0xffff),
-    m_no_zap(disableZap), m_do_compose(enableCompose),
-    m_keymap(nullptr), m_keymap_size(0), m_keycompose(nullptr), m_keycompose_size(0)
+    m_modifiers(0),
+    m_no_zap(disableZap),
+    m_keymap(nullptr), m_keymap_size(0)
 {
     qCDebug(EpaperEvdevKeyboardLog) << "Create keyboard handler with for device" << device;
 
@@ -200,16 +200,13 @@ std::unique_ptr<EpaperEvdevKeyboardHandler> EpaperEvdevKeyboardHandler::create(c
     int repeatDelay = 400;
     int repeatRate = 80;
     bool disableZap = false;
-    bool enableCompose = false;
     int grab = 0;
 
-// FIXME use QStringView!
+    // FIXME use QStringView!
     const auto args = specification.split(QLatin1Char(':'));
     for (const QString &arg : args) {
         if (arg == QLatin1String("disable-zap"))
             disableZap = true;
-        else if (arg == QLatin1String("enable-compose"))
-            enableCompose = true;
         else if (arg.startsWith(QLatin1String("repeat-delay=")))
             repeatDelay = arg.mid(13).toInt();
         else if (arg.startsWith(QLatin1String("repeat-rate=")))
@@ -228,7 +225,7 @@ std::unique_ptr<EpaperEvdevKeyboardHandler> EpaperEvdevKeyboardHandler::create(c
             ::ioctl(fd.get(), EVIOCSREP, kbdrep);
         }
 
-        return std::unique_ptr<EpaperEvdevKeyboardHandler>(new EpaperEvdevKeyboardHandler(device, fd, disableZap, enableCompose));
+        return std::unique_ptr<EpaperEvdevKeyboardHandler>(new EpaperEvdevKeyboardHandler(device, fd, disableZap));
     } else {
         qErrnoWarning("Cannot open keyboard input device '%ls'", qUtf16Printable(device));
         return nullptr;
@@ -468,23 +465,6 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
         }
 
         skip = true; // no need to tell Qt about it
-    } else if ((qtcode == Qt::Key_Multi_key) && m_do_compose) {
-        // the Compose key was pressed
-        if (first_press)
-            m_composing = 2;
-        skip = true;
-    } else if ((it->flags & EpaperEvdevKeyboardMap::IsDead) && m_do_compose) {
-        // a Dead key was pressed
-        if (first_press && m_composing == 1 && m_dead_unicode == unicode) { // twice
-            m_composing = 0;
-            qtcode = Qt::Key_unknown; // otherwise it would be Qt::Key_Dead...
-        } else if (first_press && unicode != 0xffff) {
-            m_dead_unicode = unicode;
-            m_composing = 1;
-            skip = true;
-        } else {
-            skip = true;
-        }
     }
 
     if (!skip) {
@@ -501,53 +481,6 @@ EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKey
         // TODO: we should instead remove modifiers from qtcode on all IsLetter mappings, and then we can drop the IsLetter test below.
         if (!hadSpecificMappingWithModifiers || !hadModifiersAssigned || (map_withmod->flags & EpaperEvdevKeyboardMap::IsLetter)) {
             qtcode |= EpaperEvdevKeyboardHandler::toQtModifiers(modifiers);
-        }
-
-        if (m_composing == 2 && first_press && !(it->flags & EpaperEvdevKeyboardMap::IsModifier)) {
-            // the last key press was the Compose key
-            if (unicode != 0xffff) {
-                int idx = 0;
-                // check if this code is in the compose table at all
-                for (; idx < m_keycompose_size; ++idx) {
-                    if (m_keycompose[idx].first == unicode)
-                        break;
-                }
-                if (idx < m_keycompose_size) {
-                    // found it -> simulate a Dead key press
-                    m_dead_unicode = unicode;
-                    unicode = 0xffff;
-                    m_composing = 1;
-                    skip = true;
-                } else {
-                    m_composing = 0;
-                }
-            } else {
-                m_composing = 0;
-            }
-        } else if (m_composing == 1 && first_press && !(it->flags & EpaperEvdevKeyboardMap::IsModifier)) {
-            // the last key press was a Dead key
-            bool valid = false;
-            if (unicode != 0xffff) {
-                int idx = 0;
-                // check if this code is in the compose table at all
-                for (; idx < m_keycompose_size; ++idx) {
-                    if (m_keycompose[idx].first == m_dead_unicode && m_keycompose[idx].second == unicode)
-                        break;
-                }
-                if (idx < m_keycompose_size) {
-                    quint16 composed = m_keycompose[idx].result;
-                    if (composed != 0xffff) {
-                        unicode = composed;
-                        qtcode = Qt::Key_unknown;
-                        valid = true;
-                    }
-                }
-            }
-            if (!valid) {
-                unicode = m_dead_unicode;
-                qtcode = Qt::Key_unknown;
-            }
-            m_composing = 0;
         }
 
         if (!skip) {
@@ -645,39 +578,39 @@ void EpaperEvdevKeyboardHandler::resetKeymap()
     switch (keymap) {
     case EpaperEvdevInputLocale::Denmark:
         populateKeymap<Locale::Denmark>();
-        qCDebug(EpaperEvdevKeyboardLog) << "setting Danish keymap" << m_keymap_size << m_keycompose_size;
+        qCDebug(EpaperEvdevKeyboardLog) << "setting Danish keymap" << m_keymap_size;
         break;
     case EpaperEvdevInputLocale::Norway:
         populateKeymap<Locale::Norway>();
-        qCDebug(EpaperEvdevKeyboardLog) << "setting Norwegian keymap" << m_keymap_size << m_keycompose_size;
+        qCDebug(EpaperEvdevKeyboardLog) << "setting Norwegian keymap" << m_keymap_size;
         break;
     case EpaperEvdevInputLocale::Finland:
     case EpaperEvdevInputLocale::Sweden:
         // Finnish and Swedish layouts are the same.
         populateKeymap<Locale::Sweden>();
-        qCDebug(EpaperEvdevKeyboardLog) << "setting Swedish/Finnish keymap" << m_keymap_size << m_keycompose_size;
+        qCDebug(EpaperEvdevKeyboardLog) << "setting Swedish/Finnish keymap" << m_keymap_size;
         break;
     case EpaperEvdevInputLocale::UnitedKingdom:
         populateKeymap<Locale::UnitedKingdom>();
-        qCDebug(EpaperEvdevKeyboardLog) << "setting UK keymap" << m_keymap_size << m_keycompose_size;
+        qCDebug(EpaperEvdevKeyboardLog) << "setting UK keymap" << m_keymap_size;
         break;
     case EpaperEvdevInputLocale::UnitedStates:
         populateKeymap<Locale::UnitedStates>();
-        qCDebug(EpaperEvdevKeyboardLog) << "setting US keymap" << m_keymap_size << m_keycompose_size;
+        qCDebug(EpaperEvdevKeyboardLog) << "setting US keymap" << m_keymap_size;
         break;
     case EpaperEvdevInputLocale::Spain:
         populateKeymap<Locale::Spain>();
-        qCDebug(EpaperEvdevKeyboardLog) << "setting Spanish keymap" << m_keymap_size << m_keycompose_size;
+        qCDebug(EpaperEvdevKeyboardLog) << "setting Spanish keymap" << m_keymap_size;
         break;
     case EpaperEvdevInputLocale::France:
         populateKeymap<Locale::France>();
         // French has exceptions where caps lock is neither ignored nor treated the same with shift modifier.
         m_capsLockException.assign(std::cbegin(Locale::France::capsLockException), std::cend(Locale::France::capsLockException));
-        qCDebug(EpaperEvdevKeyboardLog) << "setting French keymap" << m_keymap_size << m_keycompose_size;
+        qCDebug(EpaperEvdevKeyboardLog) << "setting French keymap" << m_keymap_size;
         break;
     case EpaperEvdevInputLocale::Germany:
         populateKeymap<Locale::Germany>();
-        qCDebug(EpaperEvdevKeyboardLog) << "setting German keymap" << m_keymap_size << m_keycompose_size;
+        qCDebug(EpaperEvdevKeyboardLog) << "setting German keymap" << m_keymap_size;
         break;
     default:
         qCWarning(EpaperEvdevKeyboardLog) << "setting *no* keymap! uh oh!";
@@ -686,8 +619,6 @@ void EpaperEvdevKeyboardHandler::resetKeymap()
     // reset state, so we could switch keymaps at runtime
     m_modifiers = 0;
     memset(m_locks, 0, sizeof(m_locks));
-    m_composing = 0;
-    m_dead_unicode = 0xffff;
 
     // Set locks according to keyboard leds
     quint16 ledbits[1];
@@ -750,9 +681,6 @@ void EpaperEvdevKeyboardHandler::populateKeymap()
 
     // Populate m_keymap with contents of locale map.
     std::copy(LocaleType::keymap, LocaleType::keymap + LocaleType::keymapSize, m_keymap);
-
-    m_keycompose_size = LocaleType::keycomposeSize;
-    m_keycompose = LocaleType::keycompose;
 }
 
 QT_END_NAMESPACE
