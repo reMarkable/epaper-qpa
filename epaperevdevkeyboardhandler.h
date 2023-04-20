@@ -175,7 +175,7 @@ public:
 class EpaperEvdevKeyboardHandler : public QObject
 {
 public:
-    EpaperEvdevKeyboardHandler(const QString &device, EpaperEvdevFdContainer &fd, bool disableZap, bool enableCompose);
+    EpaperEvdevKeyboardHandler(const QString &device, EpaperEvdevFdContainer &fd, bool disableZap);
     ~EpaperEvdevKeyboardHandler();
 
     enum class EpaperEvdevInputLocale {
@@ -254,17 +254,12 @@ private:
     // keymap handling
     quint16 m_modifiers;
     quint8 m_locks[3];
-    int m_composing;
-    quint16 m_dead_unicode;
 
     bool m_no_zap;
-    bool m_do_compose;
 
     bool m_didLoadKeymap = false;
     EpaperEvdevKeyboardMap::Mapping *m_keymap;
     int m_keymap_size;
-    const EpaperEvdevKeyboardMap::Composing *m_keycompose;
-    int m_keycompose_size;
 
     std::vector<std::pair<quint16, quint16>> m_capsLockException;
     QFileSystemWatcher m_watcher;
