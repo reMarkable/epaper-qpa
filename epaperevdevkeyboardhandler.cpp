@@ -70,8 +70,8 @@
 
 QT_BEGIN_NAMESPACE
 
-Q_LOGGING_CATEGORY(EpaperEvdevKeyboardLog, "rm.epaperkeyboardhandler")
-Q_LOGGING_CATEGORY(EpaperEvdevKeyboardMapLog, "rm.epaperkeyboardhandler.map")
+Q_LOGGING_CATEGORY(EpaperEvdevKeyboardLog, "rm.epaperkeyboardhandler", QtWarningMsg)
+Q_LOGGING_CATEGORY(EpaperEvdevKeyboardMapLog, "rm.epaperkeyboardhandler.map", QtWarningMsg)
 
 namespace {
 QSettings const qtSettings("remarkable", "xochitl");
