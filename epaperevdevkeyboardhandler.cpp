@@ -49,6 +49,8 @@
 #include <QSocketNotifier>
 #include <QStringList>
 #include <private/qcore_unix_p.h>
+#include <qpa/qplatforminputcontext.h>
+#include <qpa/qplatformintegration.h>
 #include <qpa/qwindowsysteminterface.h>
 
 #include <QtGui/private/qguiapplication_p.h>
@@ -313,15 +315,27 @@ void EpaperEvdevKeyboardHandler::readKeycode()
     }
 }
 
-void EpaperEvdevKeyboardHandler::processKeyEvent(int nativecode, int unicode, int qtcode,
+void EpaperEvdevKeyboardHandler::processKeyEvent(int keyCode, int unicode, int qtcode,
                                                  Qt::KeyboardModifiers modifiers, bool isPress, bool autoRepeat)
 {
     if (!autoRepeat)
         QGuiApplicationPrivate::inputDeviceManager()->setKeyboardModifiers(EpaperEvdevKeyboardHandler::toQtModifiers(m_modifiers));
 
-    QWindowSystemInterface::handleExtendedKeyEvent(0, (isPress ? QEvent::KeyPress : QEvent::KeyRelease),
-                                                   qtcode, modifiers, nativecode + 8, 0, int(modifiers),
-                                                   (unicode != 0xffff) ? QString(QChar(unicode)) : QString(), autoRepeat);
+    const QEvent::Type type = isPress ? QEvent::KeyPress : QEvent::KeyRelease;
+    const quint32 nativeCode = keyCode + 8;
+    const quint32 nativeScanCode = 0;
+    const quint32 nativeModifiers = modifiers;
+    const QString text = (unicode != 0xffff) ? QString(QChar(unicode)) : QString();
+    if (const auto context = QGuiApplicationPrivate::platformIntegration()->inputContext()) {
+        QKeyEvent event(type, qtcode, modifiers, nativeCode, nativeScanCode, nativeModifiers, text, autoRepeat);
+        if (context->filterEvent(&event)) {
+            return;
+        }
+    }
+
+    QWindowSystemInterface::handleExtendedKeyEvent(0, type,
+                                                   qtcode, modifiers, nativeCode, nativeScanCode, nativeModifiers,
+                                                   text, autoRepeat);
 }
 
 EpaperEvdevKeyboardHandler::KeycodeAction EpaperEvdevKeyboardHandler::processKeycode(quint16 keycode, bool pressed, bool autorepeat)
