@@ -48,7 +48,7 @@
 
 QT_BEGIN_NAMESPACE
 
-Q_DECLARE_LOGGING_CATEGORY(qLcEvdevKey)
+Q_LOGGING_CATEGORY(qLcEvdevKey, "qt.qpa.input")
 
 // This code is originally from QEvdevUtil, extracted to keep this code independent.
 namespace EpaperEvdevUtil {
